@@ -4,6 +4,7 @@ desktop.ini
 .env
 *.key
 credentials.*
+node_modules/
 
 # Office 產出走 OneDrive，不進 git（見 agents.md 檔案放置約定）
 *.pptx
