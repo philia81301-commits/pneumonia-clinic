@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台灣成人肺炎鏈球菌疫苗比較與政策現況</title>
+<style>
+  :root{
+    --bg:#f7f9fb; --card:#fff; --ink:#1a2531; --ink2:#4a5b6d; --line:#dfe6ee;
+    --accent:#1f6f8b; --accent-l:#e8f2f6; --warn:#b45309; --warn-l:#fef6e7;
+    --bad:#b32d2d; --bad-l:#fdeeee; --ok:#1e7a52; --ok-l:#e8f6ef;
+    --pcv20:#2f6fb5; --pcv21:#b5642f; --shared:#5b7a8c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+    line-height:1.75;font-size:16px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+  header{background:linear-gradient(160deg,#1f6f8b,#154f63);color:#fff;padding:44px 20px 36px;margin-bottom:28px}
+  header .wrap{padding-bottom:0}
+  h1{margin:0 0 8px;font-size:30px;line-height:1.35}
+  .sub{opacity:.9;font-size:15px;margin:0}
+  .meta{margin-top:16px;font-size:13px;opacity:.85}
+  h2{font-size:23px;margin:44px 0 6px;padding-top:12px;border-top:3px solid var(--accent);display:flex;align-items:baseline;gap:10px}
+  h2 .num{font-size:14px;color:var(--accent);font-weight:700;letter-spacing:.08em}
+  h3{font-size:18px;margin:26px 0 8px;color:var(--accent)}
+  h4{font-size:16px;margin:18px 0 6px}
+  p{margin:10px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:16px 0}
+  .lead{font-size:17px;color:var(--ink2)}
+  .tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;background:var(--accent-l);
+    color:var(--accent);font-weight:700;vertical-align:middle;margin-left:6px}
+  .tag.warn{background:var(--warn-l);color:var(--warn)}
+  .tag.bad{background:var(--bad-l);color:var(--bad)}
+  .tag.ok{background:var(--ok-l);color:var(--ok)}
+  .note{border-left:4px solid var(--accent);background:var(--accent-l);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .note.warn{border-color:var(--warn);background:var(--warn-l)}
+  .note.bad{border-color:var(--bad);background:var(--bad-l)}
+  .note.ok{border-color:var(--ok);background:var(--ok-l)}
+  .note p:first-child{margin-top:0}.note p:last-child{margin-bottom:0}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef3f7;font-weight:700;white-space:nowrap}
+  tbody tr:nth-child(even){background:#fbfcfd}
+  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:18px 0}
+  .kpi>div{background:#fff;border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:8px;padding:14px 16px}
+  .kpi .v{font-size:27px;font-weight:800;color:var(--accent);line-height:1.2}
+  .kpi .l{font-size:13px;color:var(--ink2);margin-top:3px}
+  .src{font-size:12px;color:var(--ink2);margin-top:6px}
+  .src a{color:var(--accent)}
+  a{color:var(--accent)}
+  /* 血清型矩陣 */
+  .mx{font-size:13px;border-collapse:separate;border-spacing:0}
+  .mx th,.mx td{padding:5px 4px;text-align:center;white-space:nowrap;border:1px solid var(--line)}
+  .mx th.vx{text-align:left;position:sticky;left:0;background:#eef3f7;z-index:2;min-width:74px}
+  .mx td.vx{text-align:left;position:sticky;left:0;background:#fff;font-weight:700;z-index:2}
+  .dot{display:inline-block;width:13px;height:13px;border-radius:50%;background:#cfd8e0}
+  .dot.on{background:var(--accent)}
+  .mx td.hl .dot.on{background:#d97706}
+  .mx col.dim,.mx td.dim{opacity:.22}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  button{font:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--line);background:#fff;
+    border-radius:7px;cursor:pointer;color:var(--ink)}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  /* 決策器 */
+  .tool{background:#fff;border:2px solid var(--accent);border-radius:12px;padding:22px;margin:18px 0}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  label{display:block;font-size:14px;font-weight:700;margin:12px 0 5px}
+  input[type=number],select{font:inherit;font-size:15px;padding:8px 10px;width:100%;
+    border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
+  .chk{font-weight:400;font-size:14px;margin:5px 0;display:flex;gap:8px;align-items:flex-start}
+  .chk input{margin-top:5px;flex:none}
+  .agebox{font-size:14px;color:var(--ink2);margin-top:6px;min-height:22px}
+  .agebox b{font-size:19px;color:var(--accent)}
+  #out{margin-top:20px}
+  .res{border-radius:10px;padding:18px 20px;border:1px solid var(--line);background:#fff}
+  .res .hl{font-size:21px;font-weight:800;margin-bottom:4px}
+  .res.go{border-left:6px solid var(--ok);background:var(--ok-l)}
+  .res.go .hl{color:var(--ok)}
+  .res.wait{border-left:6px solid var(--warn);background:var(--warn-l)}
+  .res.wait .hl{color:var(--warn)}
+  .res.done{border-left:6px solid var(--shared);background:#eef2f5}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:99px;padding:5px 13px;font-size:14px}
+  .pill b{color:var(--accent)}
+  .wlist{margin:14px 0 0;padding:0;list-style:none;font-size:14px}
+  .wlist li{border-left:3px solid var(--warn);background:var(--warn-l);padding:9px 13px;border-radius:0 6px 6px 0;margin:7px 0}
+  .wlist li.high{border-color:var(--bad);background:var(--bad-l)}
+  .wlist li.info{border-color:var(--shared);background:#eef2f5}
+  /* 流程圖 */
+  .flow{display:grid;gap:10px;margin:16px 0}
+  .fnode{background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px 15px;font-size:15px}
+  .fnode .q{font-weight:700;color:var(--accent)}
+  .fnode .a{margin-top:6px;padding-left:14px;border-left:3px solid var(--accent-l)}
+  .ref{font-size:14px}
+  .ref li{margin:7px 0}
+  footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink2)}
+  .toc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 20px;margin:18px 0}
+  .toc ol{margin:6px 0;padding-left:22px;columns:2;column-gap:28px}
+  .toc li{margin:3px 0;font-size:14px;break-inside:avoid}
+  @media print{
+    body{background:#fff}header{background:#154f63 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .tool,.btns{display:none}
+  }
+  @media (max-width:640px){
+    h1{font-size:24px}h2{font-size:20px}.toc ol{columns:1}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>台灣成人肺炎鏈球菌疫苗<br>血清型涵蓋、效力證據與公費政策</h1>
+    <p class="sub">PPV23 ／ PCV13 ／ PCV20 ／ PCV21 四支疫苗比較　—　給醫療專業人員</p>
+    <p class="meta">資料查證日：2026-08-07　｜　規則表版本 <span id="rv"></span>　｜　本報告不使用任何病人資料</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="note bad">
+  <p><b>⏰ 政策速報：新制 2026 年 8 月 10 日上路</b></p>
+  <p>成人公費肺炎鏈球菌疫苗全面升級為 <b>PCV20 或 PCV21 二擇一、「1 劑搞定」</b>，取代舊制 PCV13＋PPV23 兩劑。
+  <b>PPV23 不再提供公費接種</b>，疾管署辦理回收作業。</p>
+  <p class="src">來源：<a href="https://www.cdc.gov.tw/Bulletin/Detail/314drgt9vg05Js-q1Wgdrw?typeid=48" target="_blank" rel="noopener">疾管署致醫界通函第 612 號</a>（2026-07-28 發布，查詢日 2026-08-07）</p>
+</div>
+
+<div class="toc">
+  <b>本報告內容</b>
+  <ol>
+    <li><a href="#s1">台灣流行病學現況</a></li>
+    <li><a href="#s2">四支疫苗的血清型組成</a></li>
+    <li><a href="#s3">免疫橋接：讀懂效力數字的前提</a></li>
+    <li><a href="#s4">效力證據等級</a></li>
+    <li><a href="#s5">公費政策與高風險個案分層</a></li>
+    <li><a href="#s6">互動接種建議決策器</a></li>
+    <li><a href="#s7">補接種流程圖</a></li>
+    <li><a href="#s8">與其他疫苗的合併施打</a></li>
+    <li><a href="#s9">引用出處</a></li>
+  </ol>
+</div>
+
+<!-- ══════════════ 1 ══════════════ -->
+<h2 id="s1"><span class="num">01</span>台灣流行病學現況</h2>
+<p class="lead">公費疫苗施打後 IPD 曾明顯下降，但新冠疫情解封後再度回升。主因是成人疫苗覆蓋率偏低，加上非疫苗血清型上升。</p>
+
+<div class="kpi">
+  <div><div class="v">1.25</div><div class="l">2024 年 IPD 發生率<br>（每十萬人口）</div></div>
+  <div><div class="v">約 7 成</div><div class="l">病例發生於<br>50 歲以上成人</div></div>
+  <div><div class="v">約 12%</div><div class="l">2024 年完整接種<br>（PCV13/15＋PPV23 兩劑）比率</div></div>
+  <div><div class="v">347 例</div><div class="l">2025 年 IPD 確定病例<br>（死亡 36 例）</div></div>
+</div>
+<p class="src">來源：林冠吟。〈肺炎鏈球菌疫苗與呼吸道融合病毒疫苗〉。<b>內科學誌 2025;36(6):381-386</b>，DOI: 10.6314/JIMT.202512_36(6).04（查詢日 2026-08-07）；病例數為疾管署法定傳染病統計。</p>
+
+<div class="note warn">
+  <p><b>引用注意</b>：疾管署另有「完成率 36%」的說法，與本文的「完整接種 12%」定義不同（前者為曾接種、後者為完整兩劑）。
+  兩個數字<b>不可混用</b>，引用時務必標明定義。</p>
+</div>
+
+<h3>血清型置換：這是理解 PCV21 的關鍵</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>趨勢</th><th>血清型</th><th>說明</th></tr></thead>
+  <tbody>
+    <tr><td><b>下降</b>（PCV13 涵蓋型）</td><td>6B、14、19F、23F、19A</td><td>幼兒常規接種產生群體免疫後明顯下降</td></tr>
+    <tr><td><b>上升成為主流</b><br>（非 PCV13 型）</td><td><b>15A、15C、23A、35B</b></td><td>2012–2014 年 15A、15B、23A 增加；2018 年起 34、35B 亦增加。韓國、日本觀察到相同現象</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="note ok">
+  <p><b>本報告的核心觀察</b>：PCV21 獨有的 8 個血清型當中，<b>15A、15C、23A、35B 四型正是台灣近年上升的主流型</b>。
+  這是台灣本土資料，不是套用他國數字。</p>
+</div>
+<p class="src">原始文獻：Chiang CS, et al. <i>Vaccine</i> 2014;32(27):3345-9；Huang H, et al. <i>J Microbiol Immunol Infect</i> 2023;56(2):299-310</p>
+
+<div class="note">
+  <p><b>資料限制</b>：現有公開資料提供的是血清型趨勢<b>方向</b>，未提供台灣各血清型的<b>精確百分比分佈</b>，
+  因此本報告<b>不以台灣資料重算涵蓋率百分比</b>。網路流傳「新疫苗涵蓋台灣成人 IPD 逾 80%／84%」的數字
+  目前僅見於公關稿與媒體報導，<b>未經同儕審查文獻或官方資料證實，本報告不予採用</b>。</p>
+</div>
+
+<!-- ══════════════ 2 ══════════════ -->
+<h2 id="s2"><span class="num">02</span>四支疫苗的血清型組成</h2>
+<p class="lead">PCV20 與 PCV21 不是「21 比 20 多一價」，而是兩套不同的設計哲學。</p>
+
+<div class="btns">
+  <button data-hl="all" class="on">全部顯示</button>
+  <button data-hl="shared">PCV20 ∩ PCV21 共有（10）</button>
+  <button data-hl="only20">PCV20 獨有（9）</button>
+  <button data-hl="only21">PCV21 獨有（11）</button>
+  <button data-hl="unique8">PCV21 全新 8 型</button>
+</div>
+<div class="scroll">
+  <table class="mx" id="mx"></table>
+</div>
+<p class="src">組成來源：SAVE study, Canada 2018–21。<i>J Antimicrob Chemother</i> 2025;80(5):1377（<b>PMID 40131289</b>）
+<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12046396/" target="_blank" rel="noopener">全文</a>；
+經內科學誌 2025;36(6) 圖一交叉比對（查詢日 2026-08-07）</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>分類</th><th>數量</th><th>血清型</th></tr></thead>
+  <tbody>
+    <tr><td>兩者共有</td><td><b>10</b></td><td>3, 6A, 7F, 8, 10A, 11A, 12F, 19A, 22F, 33F</td></tr>
+    <tr><td><b>PCV20 獨有</b></td><td><b>9</b></td><td>1, 4, 5, 6B, 9V, 14, 18C, 19F, 23F</td></tr>
+    <tr><td><b>PCV21 獨有</b></td><td><b>11</b></td><td>15A, 15C, 16F, 23A, 23B, 24F, 31, 35B（8 型全新）＋ 9N, 17F, 20A</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <p><b>為什麼 PCV20 獨有型有人寫 9、有人寫 10？</b>　PCV20 含 <b>15B</b>、PCV21 含 <b>15C</b>，
+  兩者是可互相轉換的相關血清型，文獻計數時通常排除此組。原文逐字為：
+  「PCV20 contains nine serotypes (excluding 15B/C)…that are not contained in PCV21 (V116)」。</p>
+</div>
+
+<div class="note ok">
+  <p><b>設計理念差異</b>：PCV21 刻意<b>捨棄</b> 1、4、5、6B、9V、14、18C、19F、23F 這 9 型
+  （因幼兒常規接種產生群體免疫，在成人 IPD 已大幅減少），改納入 15A、23A、35B 等成人現行主流型。
+  <b>因此四支疫苗的「涵蓋率百分比」不在同一基準上，不可直接比大小。</b></p>
+</div>
+
+<!-- ══════════════ 3 ══════════════ -->
+<h2 id="s3"><span class="num">03</span>免疫橋接：讀懂效力數字的前提<span class="tag warn">請先讀這節</span></h2>
+<p class="lead">下一節的每一個「優於」「不劣於」，都必須放在這個框架裡理解，否則會被誤讀成臨床保護力的比較。</p>
+
+<h3>① 兩種證明疫苗有效的方式</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th></th><th>臨床終點試驗</th><th>免疫橋接</th></tr></thead>
+  <tbody>
+    <tr><td><b>看什麼</b></td><td>誰生病</td><td>抗體反應</td></tr>
+    <tr><td><b>做法</b></td><td>隨機分兩組，一組疫苗一組安慰劑，追蹤數年數發病人數</td>
+        <td>與已證明有效的舊疫苗頭對頭比 OPA 效價，不劣於則推論保護力不會較差</td></tr>
+    <tr><td><b>代表</b></td><td><b>PCV13</b>（CAPiTA）</td><td><b>PCV15、PCV20、PCV21</b> 全部走這條路</td></tr>
+  </tbody>
+</table>
+</div>
+<p><b>OPA</b>（opsonophagocytic activity，調理吞噬活性）測的是血清能否促使白血球吞噬並殺死肺炎鏈球菌，比單純測 IgG 更接近真實殺菌功能，是成人試驗的首選終點。</p>
+
+<h3>② 為什麼新疫苗不再做 CAPiTA 那種試驗</h3>
+<p><b>1. 事件太稀少</b>——幼兒接種後群體免疫使成人疫苗型肺炎大幅減少，所需樣本數比 84,496 更大。
+<b>2. 倫理限制</b>——已有有效疫苗，不能再讓對照組打安慰劑。
+<b>3. 時間與成本</b>——每加一個價數就重做一次大型試驗並不可行。</p>
+<p>這是 <b>FDA、EMA 都接受的法規既定路徑</b>，不是廠商規避試驗。</p>
+
+<h3>③ PCV20 的橋接鏈</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>血清型</th><th>橋接對象</th><th>可推論的保護範圍</th></tr></thead>
+  <tbody>
+    <tr><td>與 PCV13 共有的 <b>13 型</b></td><td>PCV13（有 CAPiTA）</td><td>IPD ＋ 肺炎</td></tr>
+    <tr><td>額外的 <b>7 型</b></td><td>PPSV23</td><td><b>僅 IPD，不含肺炎</b></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="note warn">
+  <p>第二列是關鍵：PPSV23 本身對肺炎的效果證據就不一致，<b>橋接對象證明不了的事，橋接過來也證明不了</b>。
+  嚴格說，PCV20 對那 7 個額外血清型<b>只有「預防侵襲性疾病」的推論，沒有「預防肺炎」的推論</b>。</p>
+</div>
+
+<h3>④ 這套方法真正的限制</h3>
+<div class="note bad">
+  <p><b>成人沒有已驗證的保護相關指標（correlate of protection）。</b></p>
+  <p>逐字原文（出自 V116 與 PCV20 的臨床試驗計畫書）：</p>
+  <p><i>"IgG antibody and OPA titer threshold values that correlate with protection in adults have not been defined."</i></p>
+  <p>意思是：沒有人知道 OPA 效價要多高才等於「不會發病」，也沒有公式能把效價差距換算成發病率差距。</p>
+</div>
+<p><b>臨床類比</b>：這就像用 <b>LDL 降幅</b>核准一支新的降血脂藥，而不是做心血管事件試驗。
+LDL 降得多是事實，但降多少 LDL 換到多少心肌梗塞減少，是另一個問題。</p>
+
+<h3>⑤ 本報告的用語紅線</h3>
+<div class="grid2">
+  <div class="note ok"><p><b>可以說</b></p>
+    <p>・PCV21 涵蓋 15A、15C、23A、35B 等台灣近年上升的血清型<br>
+       ・PCV21 在 11 個獨有血清型中的 10 個免疫原性優於 PCV20<br>
+       ・PCV20／PCV21 係以免疫橋接核准，未進行臨床終點試驗</p></div>
+  <div class="note bad"><p><b>不可以說</b></p>
+    <p>・「PCV21 保護力較好」<br>
+       ・「PCV21 較能預防肺炎」<br>
+       ・任何形式的「效力 XX%」套用在 PCV20／PCV21 上<br>
+       ・把 OPA 效價倍數講成「保護力提升 X 倍」</p></div>
+</div>
+
+<!-- ══════════════ 4 ══════════════ -->
+<h2 id="s4"><span class="num">04</span>效力證據等級</h2>
+<p class="lead">只有 PPV23 與 PCV13 有臨床終點證據；PCV15、PCV20、PCV21 全部以免疫橋接核准。</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>疫苗</th><th>證據類型</th><th>說明</th></tr></thead>
+  <tbody>
+    <tr><td><b>PPV23</b></td><td>觀察性研究為主</td>
+      <td>對 IPD 有保護；<b>對肺炎的效果證據不一致</b>。多醣體疫苗，誘發不依賴 T 細胞的免疫反應，無法形成長期記憶 B 細胞</td></tr>
+    <tr><td><b>PCV13</b></td><td><span class="tag ok">臨床終點 RCT</span></td>
+      <td>CAPiTA：荷蘭 84,496 名免疫功能正常之 ≥65 歲成人，雙盲隨機安慰劑對照</td></tr>
+    <tr><td><b>PCV15</b></td><td><span class="tag">免疫橋接</span></td><td>以安全性與免疫原性資料核准</td></tr>
+    <tr><td><b>PCV20</b></td><td><span class="tag">免疫橋接</span></td>
+      <td>13 型橋接 PCV13（IPD＋肺炎）；7 型橋接 PPSV23（<b>僅 IPD</b>）</td></tr>
+    <tr><td><b>PCV21</b></td><td><span class="tag">免疫橋接</span></td>
+      <td>頭對頭試驗顯示：相較 PCV20，11 個獨有血清型中的 10 個免疫原性優越</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>CAPiTA：唯一的成人臨床終點試驗</h3>
+<p>收案 <b>84,496</b> 人（PCV13 組 n=42,240／安慰劑組 n=42,256），平均追蹤約 <b>4 年</b>。</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>終點</th><th>疫苗效力 VE</th><th>信賴區間</th><th>P 值</th></tr></thead>
+  <tbody>
+    <tr><td><b>疫苗血清型社區型肺炎</b>（主要終點）</td><td><b>45.56%</b></td><td>95.2% CI: 21.82–62.49</td><td>0.0006</td></tr>
+    <tr><td>非菌血性／非侵襲性 VT-CAP</td><td>45.00%</td><td>95.2% CI: 14.21–65.31</td><td>0.0067</td></tr>
+    <tr><td><b>疫苗血清型侵襲性疾病</b></td><td><b>75.00%</b></td><td>95% CI: 41.43–90.78</td><td>0.0005</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="src">來源：<b>PMID 26076136</b>　<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4514202/" target="_blank" rel="noopener">全文</a>；
+原始試驗 Bonten MJM, et al. <i>N Engl J Med</i> 2015;372:1114-25（查詢日 2026-08-07）</p>
+
+<div class="note bad">
+  <p><b>兩個必須一起講的但書</b></p>
+  <p><b>1. 信賴區間是 95.2%，不是 95%</b>（前兩個終點，期中分析 alpha 消耗所致），引用時照抄不要改寫。</p>
+  <p><b>2. 全因肺炎與全因死亡率是探索性終點</b>，原文逐字：
+  <i>"Prevention of all-cause CAP and mortality were exploratory endpoints, and the study was neither designed nor powered to assess the difference between the vaccine and placebo groups for these endpoints."</i><br>
+  → <b>不可以說「PCV13 可降低肺炎住院或死亡」。</b>它證明的是<b>疫苗血清型</b>肺炎減少 45.56%，不是所有肺炎。</p>
+</div>
+
+<h3>STRIDE-3：PCV21 vs PCV20 頭對頭試驗</h3>
+<p>隨機分配 <b>2,663</b> 人（實際接種 2,656 人），<b>主動對照組即為 PCV20</b>。
+Cohort 1（≥50 歲）1:1 分配；Cohort 2（18–49 歲）2:1 分配。</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>項目</th><th>結果</th></tr></thead>
+  <tbody>
+    <tr><td>兩疫苗共有的 10 種血清型</td><td>第 30 天達<b>非劣效</b>（p&lt;0.0001）</td></tr>
+    <tr><td>V116 獨有的 11 種血清型</td><td><b>其中 10 種達優效</b>（p&lt;0.0001）</td></tr>
+    <tr><td><b>唯一未達優效者</b></td><td><b>血清型 15C（p=0.41）</b></td></tr>
+    <tr><td>18–49 歲 vs 50–64 歲</td><td>所有血清型免疫反應不劣於（p&lt;0.0001）</td></tr>
+    <tr><td>不良事件（Cohort 1）</td><td>V116 58.2%／PCV20 66.2%</td></tr>
+    <tr><td>死亡</td><td>6 例（均在 Cohort 1），均判定<b>與疫苗無關</b>；無疫苗相關嚴重不良事件</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="src">Platt HL, et al.（STRIDE-3 Study Group）. <i>Lancet Infect Dis</i> 2024;24(10):1141-1150.
+DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07）</p>
+
+<div class="note warn">
+  <p><b>15C 這個例外值得注意</b>：新聞稿只寫「11 個中的 10 個優效」，未指名失敗者；原始論文顯示是 <b>15C（p=0.41）</b>。
+  <b>合理推測</b>（本報告推論，非論文明述）：PCV20 含 15B，與 15C 可互相轉換並可能產生交叉反應，使 V116 難以顯示優效。
+  這對台灣特別相關——<b>15C 正是台灣近年上升的血清型之一</b>。</p>
+  <p>這也示範了本報告第 03 節的主旨：<b>免疫橋接的結論必須回原始論文讀，摘要與新聞稿會遺漏關鍵細節。</b></p>
+</div>
+
+<div class="note">
+  <p><b>PPV23 與 PCV13 之間沒有頭對頭療效試驗</b>，任何「哪支比較好」的直接比較都是間接推論。</p>
+</div>
+
+<!-- ══════════════ 5 ══════════════ -->
+<h2 id="s5"><span class="num">05</span>公費政策與高風險個案分層</h2>
+
+<h3>公費對象三類</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>類別</th><th>條件</th><th>備註</th></tr></thead>
+  <tbody>
+    <tr><td>長者</td><td><b>65 歲（含）以上</b></td><td>—</td></tr>
+    <tr><td>原住民</td><td><b>55–64 歲</b></td><td>—</td></tr>
+    <tr><td>IPD 高風險</td><td><b>19–64 歲</b>，符合下列 6 類之一</td><td>需備診斷書等佐證，或由醫師依健保就醫資料、病歷評估</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>高風險個案必須分兩層看<span class="tag warn">門診最常給錯的地方</span></h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>層</th><th>適應症</th><th>19–64 歲</th><th>65 歲以上</th></tr></thead>
+  <tbody>
+    <tr><td><b>第一層</b><br>公費高風險</td>
+        <td>脾臟功能缺損、先天或後天免疫功能不全、人工耳植入、腦脊髓液滲漏、一年內接受免疫抑制劑或放射治療的惡性腫瘤者、器官移植者</td>
+        <td><span class="tag ok">公費</span></td><td><span class="tag ok">公費</span></td></tr>
+    <tr><td><b>第二層</b><br>臨床高風險<br>但非公費</td>
+        <td>糖尿病、慢性心臟病、慢性肺病／COPD、氣喘、慢性肝病與肝硬化、慢性腎病與腎病症候群、酒精使用障礙、吸菸者</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td></tr>
+    <tr><td>無上述適應症</td><td>—</td><td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="note bad">
+  <p><b>臨床關鍵句</b>：第二層族群的分界是<b>年齡而非疾病</b>——<b>62 歲糖尿病患者自費，66 歲同一個人公費</b>。</p>
+  <p>文獻支持主動評估自費接種：具 <b>2 個以上共病症</b>者，其肺炎風險與高風險患者相當或甚至更高。
+  （Pelton SI, et al. <i>BMC Infect Dis</i> 2015;15:470）</p>
+</div>
+
+<h3>台美差異速查</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>項目</th><th>台灣公費（2026-08-10 起）</th><th>美國 ACIP</th></tr></thead>
+  <tbody>
+    <tr><td>起始年齡</td><td><b>65 歲</b>（55–64 歲原住民另計）</td><td><b>50 歲</b></td></tr>
+    <tr><td>高風險定義</td><td><b>窄</b>：僅上述 6 類</td><td><b>寬</b>：另含糖尿病、慢性心／肺／肝／腎病、吸菸、酒精使用障礙等</td></tr>
+    <tr><td>PPV23</td><td><b>不再提供公費接種</b>（辦理回收）</td><td>仍為方案二的一部分（PCV15 後續接種）</td></tr>
+    <tr><td>50–64 歲一般成人</td><td><b>不符公費</b>（需自費）</td><td><b>建議接種</b></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="src">台灣：疾管署致醫界通函第 612 號；美國：ACIP（MMWR Recomm Rep 2023;72(3):1-39；2024 年擴大至 ≥50 歲，PMID 39773952），經內科學誌 2025;36(6) 表一整理（查詢日 2026-08-07）</p>
+
+<!-- ══════════════ 6 ══════════════ -->
+<h2 id="s6"><span class="num">06</span>互動接種建議決策器</h2>
+<p class="lead">輸入病人條件，直接得到「該不該打 → 打哪支 → 公費或自費」。本決策器與下一節流程圖<b>共用同一份規則表</b>。</p>
+
+<div class="tool">
+  <div class="grid2">
+    <div>
+      <label for="by">西元出生年</label>
+      <input type="number" id="by" min="1900" max="2026" step="1" value="1956" placeholder="例：1956">
+      <div class="agebox" id="agebox"></div>
+
+      <label for="hist">過去接種過的肺炎鏈球菌疫苗</label>
+      <select id="hist"></select>
+
+      <label for="msl">距上次接種多久（月）</label>
+      <input type="number" id="msl" min="0" max="600" step="1" value="0">
+
+      <label>身分別</label>
+      <label class="chk"><input type="checkbox" id="indig"> 原住民</label>
+      <label class="chk"><input type="checkbox" id="inst"> 機構住民</label>
+      <label class="chk"><input type="checkbox" id="dial"> 洗腎患者</label>
+    </div>
+    <div>
+      <label>公費高風險適應症（第一層）</label>
+      <div id="fr"></div>
+      <label>臨床高風險但非公費（第二層）</label>
+      <div id="cr"></div>
+    </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<!-- ══════════════ 7 ══════════════ -->
+<h2 id="s7"><span class="num">07</span>補接種流程圖</h2>
+<p class="lead">本流程圖由規則表自動產生，與上方決策器保證一致。</p>
+<div class="flow" id="flow"></div>
+<p class="src">依據：疾管署致醫界通函第 612 號銜接接種原則（查詢日 2026-08-07）</p>
+
+<!-- ══════════════ 8 ══════════════ -->
+<h2 id="s8"><span class="num">08</span>與其他疫苗的合併施打</h2>
+<div class="note warn">
+  <p><b>本節非疾管署公告內容。</b>通函第 612 號未規範合併施打，以下依國際指引與各疫苗研究整理。</p>
+</div>
+<p class="lead"><b>肺炎鏈球菌疫苗全部都是不活化疫苗，與任何疫苗都可同日於不同部位接種，不需要任何間隔。</b></p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>組別</th><th>疫苗</th><th>與肺鏈同日</th><th>備註</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="7">不活化<br>／重組</td><td>流感疫苗</td><td><span class="tag ok">可</span></td><td>最常見組合</td></tr>
+    <tr><td>COVID-19 疫苗</td><td><span class="tag ok">可</span></td><td>可與幾乎所有疫苗同時接種</td></tr>
+    <tr><td><b>RSV 疫苗</b></td><td><span class="tag ok">可</span></td><td><b>併打時 RSV 與流感抗體效價略低</b>，臨床意義未定，不構成禁忌</td></tr>
+    <tr><td>Tdap（百日咳）</td><td><span class="tag ok">可</span></td><td>與 RZV 併用研究無免疫干擾</td></tr>
+    <tr><td>A 型肝炎疫苗</td><td><span class="tag ok">可</span></td><td>不同部位、不同針筒</td></tr>
+    <tr><td>B 型肝炎疫苗</td><td><span class="tag ok">可</span></td><td>不同部位、不同針筒</td></tr>
+    <tr><td><b>帶狀疱疹 Shingrix（RZV）</b></td><td><span class="tag ok">可</span></td>
+        <td><b>重組佐劑型，不是活性疫苗</b>。與流感、PPSV23、Tdap、PCV13 併用研究無免疫干擾</td></tr>
+    <tr><td rowspan="2">活性<br>減毒</td><td>MMR</td><td><span class="tag ok">可</span></td><td>免疫功能不全者禁用</td></tr>
+    <tr><td>水痘疫苗</td><td><span class="tag ok">可</span></td><td>免疫功能不全者禁用</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note bad">
+  <p><b>最容易寫錯的一條</b></p>
+  <p>「間隔 <b>≥28 天</b>」規則規範的是<b>兩種活性減毒注射／鼻噴型疫苗彼此之間</b>（例如 MMR 與水痘），
+  <b>不是</b>規範肺炎鏈球菌疫苗與活性疫苗之間。肺鏈是不活化疫苗，與 MMR／水痘<b>同日或任何間隔皆可</b>。</p>
+  <p><b>操作細節</b>：若兩劑活性疫苗間隔未滿 28 天，<b>第二劑視為無效</b>，須在無效劑之後再隔 ≥28 天重打。</p>
+  <p class="src">CDC Yellow Book 2026（出版日 2025-04-23）逐字：<i>"injectable or nasally administered live vaccines should be administered at intervals of ≥28 days."</i>
+  <a href="https://www.ncbi.nlm.nih.gov/books/NBK620880/" target="_blank" rel="noopener">全文</a></p>
+</div>
+
+<h4>三個例外</h4>
+<ol>
+  <li><b>無脾症／脾臟功能缺損或 HIV 感染者：PCV13 與 MenACWY-D（Menactra 廠牌）不可同時接種。</b>
+      只針對 Menactra，MenACWY-CRM（Menveo）無此限制。機轉為 Menactra 干擾 PCV13 抗體反應。
+      正確順序：先打 PCV13，至少 4 週後再打 Menactra。
+      <span class="tag warn">待確認</span> 此限制是否延伸至 PCV20／PCV21。</li>
+  <li><b>PCV15 與 PPV23 不可於同一次就診接種。</b></li>
+  <li>RSV 疫苗併打時效價略低，可考慮分開接種，但不構成禁忌。</li>
+</ol>
+
+<!-- ══════════════ 9 ══════════════ -->
+<h2 id="s9"><span class="num">09</span>引用出處</h2>
+<p class="lead">所有數字均可回溯至下列來源，查證日一律為 <b>2026-08-07</b>。</p>
+<ol class="ref">
+  <li>衛生福利部疾病管制署。<b>致醫界通函第 612 號</b>：自 115 年 8 月 10 日起成人肺炎鏈球菌疫苗全面升級為 20 價或 21 價。
+    <a href="https://www.cdc.gov.tw/Bulletin/Detail/314drgt9vg05Js-q1Wgdrw?typeid=48" target="_blank" rel="noopener">連結</a></li>
+  <li>衛生福利部疾病管制署。新聞稿：成人公費肺炎鏈球菌疫苗自 2026 年 8 月 10 日起全面升級。
+    <a href="https://www.cdc.gov.tw/Bulletin/Detail/vwMq9VkXIaV7FHyJgpk-5w?typeid=9" target="_blank" rel="noopener">連結</a></li>
+  <li>疾病管制署。<a href="https://www.cdc.gov.tw/Category/MPage/zK8mS8V4oEfjRy8Dlv0yJw" target="_blank" rel="noopener">肺炎鏈球菌疫苗專區</a></li>
+  <li>林冠吟。肺炎鏈球菌疫苗與呼吸道融合病毒疫苗。<b>內科學誌 2025;36(6):381-386</b>。DOI: 10.6314/JIMT.202512_36(6).04</li>
+  <li>SAVE study. Comparing serotype coverage of pneumococcal vaccines with PCV21 (V116)… <i>J Antimicrob Chemother</i> 2025;80(5):1377. <b>PMID 40131289</b>
+    <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12046396/" target="_blank" rel="noopener">全文</a></li>
+  <li>CAPiTA. Prevention of adult pneumococcal pneumonia with PCV13. <b>PMID 26076136</b>
+    <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4514202/" target="_blank" rel="noopener">全文</a>；
+    Bonten MJM, et al. <i>N Engl J Med</i> 2015;372:1114-25</li>
+  <li>Platt HL, et al. Safety, tolerability, and immunogenicity of V116 (<b>STRIDE-3</b>). <i>Lancet Infect Dis</i> 2024;24(10):1141-1150. <b>PMID 38964361</b></li>
+  <li>Kobayashi M, et al. Pneumococcal vaccine for adults aged ≥19 years: ACIP recommendations. <i>MMWR Recomm Rep</i> 2023;72(3):1-39；2024 年擴大建議 <b>PMID 39773952</b></li>
+  <li>CDC Yellow Book 2026. Vaccination and Immunoprophylaxis—General Principles.
+    <a href="https://www.ncbi.nlm.nih.gov/books/NBK620880/" target="_blank" rel="noopener">連結</a></li>
+  <li>Chiang CS, et al. National surveillance of invasive pneumococcal diseases in Taiwan, 2008–2012. <i>Vaccine</i> 2014;32(27):3345-9</li>
+  <li>Huang H, et al. Antimicrobial susceptibility and serotype replacement of <i>S. pneumoniae</i> before and after PCV13 introduction in Taiwan. <i>J Microbiol Immunol Infect</i> 2023;56(2):299-310</li>
+  <li>Pelton SI, et al. Rates of pneumonia among children and adults with chronic medical conditions in Germany. <i>BMC Infect Dis</i> 2015;15:470</li>
+  <li>其餘 STRIDE 系列：STRIDE-6 <i>Clin Infect Dis</i> 2024;79(6):1366；STRIDE-7 <i>Lancet HIV</i> 2025；STRIDE-8 <i>Clin Infect Dis</i> 2026;82(2):e217</li>
+</ol>
+
+<footer>
+  <p id="disc"></p>
+  <p>本報告僅供臨床參考，不取代醫師之個別臨床判斷。所有資料取自公開文獻與官方資料，<b>未使用任何病人資料</b>。</p>
+  <p>製作：2026-08-07　｜　規則表版本 <span class="rv2"></span>　｜　政策如有更新，請以疾管署最新公告為準。</p>
+</footer>
+
+</div>
+
+<script>
+/* ═══ 內嵌規則表（由 build.js 從 src/rules.json 注入，勿手動編輯）═══ */
+var PNEUMO_RULES = /*__RULES_JSON__*/;
+</script>
+<script>
+/* ═══ 內嵌決策引擎（由 build.js 從 src/engine.js 注入，勿手動編輯）═══ */
+/*__ENGINE_JS__*/
+</script>
+<script>
+(function(){
+  'use strict';
+  var E = window.PneumoEngine, R = PNEUMO_RULES;
+  document.getElementById('rv').textContent = R.meta.version;
+  Array.prototype.forEach.call(document.querySelectorAll('.rv2'), function(el){ el.textContent = R.meta.version; });
+  document.getElementById('disc').textContent = R.disclaimer;
+
+  /* ── 血清型矩陣 ── */
+  var SERO = {
+    PCV13: ['1','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F'],
+    PCV20: ['1','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F','8','10A','11A','12F','15B','22F','33F'],
+    PCV21: ['3','6A','7F','8','9N','10A','11A','12F','15A','15C','16F','17F','19A','20A','22F','23A','23B','24F','31','33F','35B'],
+    PPV23: ['1','2','3','4','5','6B','7F','8','9N','9V','10A','11A','12F','14','15B','17F','18C','19A','19F','20','22F','23F','33F']
+  };
+  var ORDER = ['1','2','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F','8','10A','11A','12F','15B','22F','33F','9N','17F','20','20A','15A','15C','16F','23A','23B','24F','31','35B'];
+  var GROUPS = {
+    shared:  ['3','6A','7F','8','10A','11A','12F','19A','22F','33F'],
+    only20:  ['1','4','5','6B','9V','14','18C','19F','23F'],
+    only21:  ['15A','15C','16F','23A','23B','24F','31','35B','9N','17F','20A'],
+    unique8: ['15A','15C','16F','23A','23B','24F','31','35B']
+  };
+  var mx = document.getElementById('mx'), html = '<thead><tr><th class="vx">疫苗</th>';
+  ORDER.forEach(function(s){ html += '<th data-s="'+s+'">'+s+'</th>'; });
+  html += '</tr></thead><tbody>';
+  ['PCV13','PCV20','PCV21','PPV23'].forEach(function(v){
+    html += '<tr><td class="vx">'+v+'</td>';
+    ORDER.forEach(function(s){
+      var on = SERO[v].indexOf(s) !== -1;
+      html += '<td data-s="'+s+'"><span class="dot'+(on?' on':'')+'"></span></td>';
+    });
+    html += '</tr>';
+  });
+  mx.innerHTML = html + '</tbody>';
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hl]'), function(b){
+    b.addEventListener('click', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('[data-hl]'), function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      var k = b.getAttribute('data-hl'), set = GROUPS[k] || null;
+      Array.prototype.forEach.call(mx.querySelectorAll('[data-s]'), function(cell){
+        var s = cell.getAttribute('data-s');
+        var hit = !set || set.indexOf(s) !== -1;
+        cell.classList.toggle('dim', !hit);
+        cell.classList.toggle('hl', !!set && hit);
+      });
+    });
+  });
+
+  /* ── 決策器 ── */
+  var $ = function(id){ return document.getElementById(id); };
+  var histSel = $('hist');
+  R.historyOptions.forEach(function(o){
+    var op = document.createElement('option'); op.value = o.id; op.textContent = o.label; histSel.appendChild(op);
+  });
+  function mkChecks(hostId, list, name){
+    var host = $(hostId);
+    list.forEach(function(c){
+      var l = document.createElement('label'); l.className = 'chk';
+      var i = document.createElement('input'); i.type = 'checkbox'; i.value = c.id; i.setAttribute('data-g', name);
+      l.appendChild(i); l.appendChild(document.createTextNode(c.label)); host.appendChild(l);
+    });
+  }
+  mkChecks('fr', R.fundedRiskConditions, 'funded');
+  mkChecks('cr', R.clinicalRiskConditions, 'clinical');
+
+  function picked(g){
+    return Array.prototype.slice.call(document.querySelectorAll('[data-g="'+g+'"]'))
+      .filter(function(i){ return i.checked; }).map(function(i){ return i.value; });
+  }
+  var YEAR = new Date().getFullYear();
+  if (YEAR < 2026) YEAR = 2026;
+
+  function render(){
+    var by = parseInt($('by').value, 10);
+    if (!by || by < 1900 || by > YEAR) { $('agebox').textContent = '請輸入有效的西元出生年'; $('out').innerHTML = ''; return; }
+    var age = YEAR - by;
+    $('agebox').innerHTML = '目前年齡：<b>' + age + '</b> 歲　<span style="font-size:12px">（' + YEAR + ' − ' + by + '，以年份計、不計月日）</span>';
+
+    var r = E.decide({
+      birthYear: by, currentYear: YEAR,
+      isIndigenous: $('indig').checked, isInstitutional: $('inst').checked, isDialysis: $('dial').checked,
+      fundedRisk: picked('funded'), clinicalRisk: picked('clinical'),
+      history: histSel.value,
+      monthsSinceLast: parseInt($('msl').value, 10) || 0
+    });
+
+    var cls = r.recommendation.action === 'vaccinate' ? 'go'
+            : r.recommendation.action === 'complete' ? 'done' : 'wait';
+    var h = '<div class="res ' + cls + '">';
+    h += '<div class="hl">' + r.recommendation.headline + '</div>';
+    h += '<div>' + r.recommendation.detail + '</div>';
+    h += '<div class="pills">';
+    h += '<span class="pill">年齡　<b>' + r.age + ' 歲</b></span>';
+    h += '<span class="pill">身分　<b>' + r.eligibility.categoryLabel + '</b></span>';
+    h += '<span class="pill">給付　<b>' + r.recommendation.payment + '</b></span>';
+    if (r.recommendation.vaccine) h += '<span class="pill">疫苗　<b>' + r.recommendation.vaccine.join(' 或 ') + '</b></span>';
+    h += '</div>';
+    if (r.recommendation.vaccineNote) h += '<div class="src">' + r.recommendation.vaccineNote + '</div>';
+    if (r.eligibility.selfPayReason) h += '<div class="src">' + r.eligibility.selfPayReason + '</div>';
+
+    h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08)">';
+    h += '<b>美國 ACIP 對照</b>（' + r.acip.tableLabel + '）：';
+    h += r.acip.applicable ? ('方案一 ' + r.acip.optionA + (r.acip.optionB ? '；方案二 ' + r.acip.optionB : '')) : r.acip.text;
+    h += '</div>';
+
+    if (r.warnings.length) {
+      h += '<ul class="wlist">';
+      r.warnings.forEach(function(w){
+        h += '<li class="' + (w.level === 'high' ? 'high' : w.level === 'info' ? 'info' : '') + '">' + w.text
+          + (w.note ? ' <span class="src">' + w.note + '</span>' : '')
+          + (w.source ? ' <span class="src">（' + w.source + '）</span>' : '') + '</li>';
+      });
+      h += '</ul>';
+    }
+    h += '<div class="src" style="margin-top:12px">依據：<a href="' + r.basis.tw.url + '" target="_blank" rel="noopener">'
+       + r.basis.tw.label + '</a>（查詢日 ' + r.basis.tw.retrieved + '）　｜　規則表 v' + r.rulesVersion + '</div>';
+    h += '<div class="src">' + r.disclaimer + '</div>';
+    h += '</div>';
+    $('out').innerHTML = h;
+  }
+  ['by','hist','msl','indig','inst','dial'].forEach(function(id){
+    $(id).addEventListener('input', render); $(id).addEventListener('change', render);
+  });
+  document.addEventListener('change', function(e){
+    if (e.target && e.target.getAttribute && e.target.getAttribute('data-g')) render();
+  });
+  render();
+
+  /* ── 流程圖：由規則表產生 ── */
+  var flow = $('flow'), fh = '';
+  fh += '<div class="fnode"><div class="q">步驟 1　是否符合公費資格？</div><div class="a">';
+  R.fundedCategories.forEach(function(c){ fh += '・' + c.label + '<br>'; });
+  fh += '以上皆非 → <b>自費</b>（65 歲以後自動轉為公費）</div></div>';
+  fh += '<div class="fnode"><div class="q">步驟 2　過去打過什麼？需要間隔多久？</div><div class="a">';
+  R.historyOptions.forEach(function(o){
+    var r = R.intervalRules[o.id];
+    var txt;
+    if (r.complete) txt = '<b>視為已完成接種，無需再打</b>';
+    else if (r.requiresAge65) txt = '<b>滿 65 歲</b>且距前劑 <b>≥5 年</b>可追加 1 劑';
+    else if (r.months === 0) txt = '<b>無間隔需求，現在即可接種</b>';
+    else txt = '間隔 <b>≥' + r.months + ' 個月</b>' + (r.shortMonths ? '（符合短間隔條件者 <b>≥8 週</b>）' : '');
+    fh += '・' + o.label + ' → ' + txt + '<br>';
+  });
+  fh += '</div></div>';
+  fh += '<div class="fnode"><div class="q">步驟 3　誰適用 8 週短間隔？</div><div class="a">';
+  R.shortIntervalEligibility.conditions.forEach(function(c){ fh += '・' + c + '<br>'; });
+  fh += '（限曾接種 PCV13 或 PCV15 者）</div></div>';
+  fh += '<div class="fnode"><div class="q">步驟 4　打哪一支？</div><div class="a"><b>'
+      + R.vaccines.offered.join(' 或 ') + '</b>，' + R.vaccines.choiceNote + '</div></div>';
+  flow.innerHTML = fh;
+})();
+</script>
+</body>
+</html>

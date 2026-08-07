@@ -4,7 +4,7 @@
  * 單一真相來源：rules.json
  * 互動決策器與補接種流程圖共用此引擎，不得各自實作判斷邏輯。
  *
- * 用法（瀏覽器）：<script src="rules.js"></script> 後呼叫 decide(input)
+ * 用法（瀏覽器）：由 build.js 內嵌後，透過 window.PneumoEngine.decide(input) 呼叫
  * 用法（Node）  ：const { decide } = require('./engine.js')
  */
 
