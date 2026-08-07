@@ -147,7 +147,9 @@ function table(s, x, y, w, rows, colW, fontSize, totalH) {
     fill: { color: 'FFFFFF' },
     valign: 'middle', autoPage: false
   };
-  if (totalH) opt.rowH = totalH / rows.length;
+  // totalH 可給數字（平均分配）或陣列（逐列指定，用於某列文字特別長時）
+  if (Array.isArray(totalH)) opt.rowH = totalH;
+  else if (totalH) opt.rowH = totalH / rows.length;
   s.addTable(rows, opt);
 }
 
@@ -215,8 +217,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('原住民'), td('55–64 歲', { bold: true, color: C.deep })],
     [td('IPD 高風險'), td('19–64 歲，且符合公告列舉的 5 項之一：\n① 脾臟功能缺損　② 先天或後天免疫功能不全　③ 人工耳植入\n④ 腦脊髓液滲漏　⑤「一年內」接受免疫抑制劑或放射治療的惡性腫瘤者及器官移植者', { bold: true, color: C.deep })]
   ];
-  table(s, M, 2.1, CW, rows, [2.9, CW - 2.9], 18, 3.3);
-  callout(s, M, 5.6, CW, 1.3,
+  table(s, M, 2.1, CW, rows, [2.9, CW - 2.9], 18, [0.62, 0.62, 0.62, 1.62]);
+  callout(s, M, 5.75, CW, 1.2,
     '「IPD 高風險對象」僅限上列 5 項。\n糖尿病、COPD、慢性肝腎疾病、吸菸等不在其中，65 歲前需自費。', 'bad', 21);
   foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）｜查詢日 2026-08-08');
   note(s, '這裡就要把 5 項講明白。「高風險」三個字很容易讓人自動聯想到糖尿病與 COPD，那是錯的，而且會一路錯到門診。第 5 項是把惡性腫瘤與器官移植併為同一項，且限一年內接受治療者。');
@@ -239,9 +241,9 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   const s = slide();
   head(s, 'IPD 發生率在疫情後回升', '台灣流病');
   bigStat(s, M, 2.3, 5.4, '1.25', '2024 年每十萬人口\n侵襲性肺炎鏈球菌感染症發生率', C.deep);
-  card(s, 6.6, 2.3, CW - 5.9, 2.1);
-  s.addText('公費疫苗施打後曾明顯下降，\n新冠疫情解封後再度回升。', {
-    x: 6.9, y: 2.55, w: CW - 6.5, h: 1.6, fontFace: F, fontSize: 22, bold: true,
+  card(s, 6.6, 2.2, CW - 5.9, 2.7);
+  s.addText('公費疫苗施打後\n曾明顯下降，\n新冠疫情解封後\n再度回升。', {
+    x: 6.9, y: 2.35, w: CW - 6.5, h: 2.4, fontFace: F, fontSize: 28, bold: true,
     color: C.ink, valign: 'middle'
   });
   foot(s, '內科學誌 2025;36(6):381-386｜查詢日 2026-08-07');
@@ -252,9 +254,9 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   const s = slide();
   head(s, '病例集中在中高齡', '台灣流病');
   bigStat(s, M, 2.3, 5.4, '約 7 成', '病例發生於\n50 歲以上成人', C.deep);
-  card(s, 6.6, 2.3, CW - 5.9, 2.1);
-  s.addText('50 歲已經是風險轉折點，\n但台灣公費從 65 歲才開始。', {
-    x: 6.9, y: 2.55, w: CW - 6.5, h: 1.6, fontFace: F, fontSize: 22, bold: true,
+  card(s, 6.6, 2.2, CW - 5.9, 2.7, C.warnBg);
+  s.addText('50 歲已經是\n風險轉折點，\n但台灣公費\n從 65 歲才開始。', {
+    x: 6.9, y: 2.35, w: CW - 6.5, h: 2.4, fontFace: F, fontSize: 28, bold: true,
     color: C.warn, valign: 'middle'
   });
   foot(s, '內科學誌 2025;36(6):381-386｜查詢日 2026-08-07');
@@ -265,9 +267,9 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   const s = slide();
   head(s, '真正的問題是覆蓋率', '台灣流病');
   bigStat(s, M, 2.3, 5.4, '約 12%', '2024 年完整接種兩劑\n（PCV13/15 ＋ PPV23）比率', C.bad);
-  card(s, 6.6, 2.3, CW - 5.9, 2.1, C.warnBg);
-  s.addText('舊制兩劑流程完成率低，\n正是改為「1 劑搞定」的政策動機。', {
-    x: 6.9, y: 2.55, w: CW - 6.5, h: 1.6, fontFace: F, fontSize: 22, bold: true,
+  card(s, 6.6, 2.2, CW - 5.9, 2.7, C.warnBg);
+  s.addText('舊制兩劑\n完成率低，\n正是改為\n「1 劑搞定」的動機。', {
+    x: 6.9, y: 2.35, w: CW - 6.5, h: 2.4, fontFace: F, fontSize: 28, bold: true,
     color: C.warn, valign: 'middle'
   });
   callout(s, M, 4.95, CW, 0.8, '疾管署另有「36%」的說法，定義為曾接種而非完整兩劑，兩者不可混用', 'warn');
@@ -739,20 +741,27 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 {
   const s = slide();
   head(s, '19–64 歲公費高風險：僅這 5 項', '步驟 1　公費資格');
-  const items = ['脾臟功能缺損', '先天或後天免疫功能不全', '人工耳植入',
-                 '腦脊髓液滲漏', '一年內免疫抑制劑或放射治療之惡性腫瘤', '器官移植者'];
+  const items = [
+    '脾臟功能缺損',
+    '先天或後天免疫功能不全',
+    '人工耳植入',
+    '腦脊髓液滲漏',
+    '「一年內」接受免疫抑制劑或放射治療的惡性腫瘤者及器官移植者'
+  ];
   items.forEach((t, i) => {
-    const col = i % 2, row = Math.floor(i / 2);
-    const x = M + col * (CW / 2 + 0.15), y = 2.25 + row * 1.15;
-    card(s, x, y, CW / 2 - 0.15, 0.95, C.okBg);
+    const y = 2.1 + i * 0.66;
+    card(s, M, y, CW, 0.58, C.okBg);
+    numCircle(s, M + 0.18, y + 0.06, 0.46, String(i + 1), C.ok);
     s.addText(t, {
-      x: x + 0.3, y: y, w: CW / 2 - 0.75, h: 0.95, fontFace: F, fontSize: 19, bold: true,
+      x: M + 0.8, y: y, w: CW - 1.0, h: 0.58, fontFace: F, fontSize: 20, bold: true,
       color: C.ink, valign: 'middle', margin: 0
     });
   });
-  callout(s, M, 5.85, CW, 0.85, '這份清單比美國 ACIP 窄得多——糖尿病、COPD 都不在其中', 'warn');
-  foot(s, '疾管署致醫界通函第 612 號逐字清單｜查詢日 2026-08-07');
-  note(s, '請同仁記住這 5 項，因為門診最常被問的其實是不在清單上的那些病。');
+  callout(s, M, 5.5, CW, 1.2,
+    '符合這 5 項只代表「對象資格」，不等於現在就能打。\n' +
+    '還要看過往接種史——已完整接種 PCV13/15＋PPV23 者，仍須滿 65 歲且與前劑間隔 5 年。', 'bad', 19);
+  foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）參、實施對象｜查詢日 2026-08-08');
+  note(s, '兩件事要一起講：一是清單只有這 5 項，糖尿病與 COPD 不在其中；二是符合對象只是第一關，過往接種史決定現在能不能打。未滿 65 歲又已完整接種兩劑的高風險對象，還是要等到 65 歲。');
 }
 
 {
@@ -942,8 +951,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('PPV23'), td('不再提供公費', { bold: true }), td('仍為方案二的一部分')],
     [td('50–64 歲一般成人'), td('不符公費', { bold: true, color: C.bad }), td('建議接種', { bold: true, color: C.ok })]
   ];
-  table(s, M, 2.15, CW, rows, [3.4, 4.2, CW - 7.6], 20, 3.05);
-  callout(s, M, 5.4, CW, 1.15, '門診最常見的落差：50–64 歲有糖尿病或 COPD 的病人', 'warn', 23);
+  table(s, M, 2.15, CW, rows, [2.9, 3.6, CW - 6.5], 19, [0.62, 0.62, 1.05, 0.62, 0.62]);
+  callout(s, M, 5.85, CW, 1.05, '門診最常見的落差：50–64 歲有糖尿病或 COPD 的病人', 'warn', 22);
   foot(s, 'ACIP 為國際指引，非疾管署公告內容｜MMWR Recomm Rep 2023;72(3):1-39；PMID 39773952');
   note(s, '這頁是比較，不是台灣的規定。決定公費與否一律看前面三個步驟。');
 }

@@ -122,6 +122,44 @@ def main(path):
                 issues.append((idx, 'OUT_OF_BOUNDS',
                                '形狀超出投影片：x=%.2f y=%.2f w=%.2f h=%.2f' % (x, y, w, h)))
 
+            # 表格儲存格的文字溢出：GraphicFrame 沒有 text_frame，
+            # 之前完全沒被檢查到，S3 的 IPD 說明文字因此被切掉。
+            if getattr(sh, 'has_table', False):
+                tbl = sh.table
+                col_w = [c.width / EMU_PER_IN for c in tbl.columns]
+                row_h = [r.height / EMU_PER_IN for r in tbl.rows]
+                for ri, row in enumerate(tbl.rows):
+                    for ci, cell in enumerate(row.cells):
+                        txt_c = cell.text.strip()
+                        if not txt_c:
+                            continue
+                        # 被合併吃掉的儲存格不重複檢查
+                        if getattr(cell, 'is_spanned', False):
+                            continue
+                        # 跨列合併：實際可用高度是所跨各列之和
+                        span = getattr(cell, 'span_height', 1) or 1
+                        rh = sum(row_h[ri:ri + span])
+                        size = 18
+                        for p in cell.text_frame.paragraphs:
+                            for r in p.runs:
+                                if r.font.size:
+                                    size = max(size, r.font.size.pt)
+                        if ci >= len(col_w):
+                            continue
+                        span_w = getattr(cell, 'span_width', 1) or 1
+                        cw = sum(col_w[ci:ci + span_w])
+                        usable = max(cw * 72.0 - 12, 20)
+                        need = 0.0
+                        for seg in txt_c.split('\n'):
+                            wpt = text_width_units(seg, size)
+                            lines = max(1, int(wpt / usable) + (1 if wpt % usable else 0))
+                            need += lines * size * 1.35 / 72.0
+                        if need > rh * OVERFLOW_TOL:
+                            issues.append((idx, 'TABLE_CELL_OVERFLOW',
+                                           '第 %d 列第 %d 欄需 %.2f" > 列高 %.2f"｜%s'
+                                           % (ri + 1, ci + 1, need, rh, txt_c[:30].replace('\n', ' '))))
+                continue
+
             if not sh.has_text_frame:
                 continue
             txt = sh.text_frame.text.strip()
@@ -172,7 +210,7 @@ def main(path):
     by_kind = {}
     for it in issues:
         by_kind.setdefault(it[1], []).append(it)
-    for kind in ('OUT_OF_BOUNDS', 'TEXT_OVERFLOW', 'TEXT_OVERLAP', 'TIGHT_MARGIN'):
+    for kind in ('OUT_OF_BOUNDS', 'TEXT_OVERFLOW', 'TABLE_CELL_OVERFLOW', 'TEXT_OVERLAP', 'TIGHT_MARGIN'):
         rows = by_kind.get(kind, [])
         if not rows:
             continue
