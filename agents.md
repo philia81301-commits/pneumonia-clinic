@@ -16,12 +16,14 @@
 
 ## 目標與路線圖
 
-- [ ] 階段一：資料查證 —— 四支疫苗血清型清單、效力證據（VE vs 免疫橋接）、台灣 IPD 流病、ACIP 與疾管署建議、9 種疫苗 co-administration 規則、PCV21 台灣核准狀態
-- [ ] 階段二：建立**單一規則表**（接種建議邏輯，供流程圖與互動決策器共用）
-- [ ] 階段三：互動式 HTML 報告（單檔可離線、含決策器、每個數字附出處與抓取日期）
-- [ ] 階段四：PowerPoint 簡報 15–20 張（套全域 PPTX 預設）
-- [ ] 階段五：A4 病人衛教單張（全白話、可列印）
-- [ ] 階段六：三份產出關鍵數字一致性核對（依規格卡驗收條件逐條檢查）
+- [x] 階段一：資料查證 —— `data/01`–`07` 七份，全附出處與查詢日
+- [x] 階段二：**單一規則表** `src/rules.json` ＋ 決策引擎 `src/engine.js`（測試 419,378 項零失敗）
+- [x] 階段三：互動式 HTML 報告（單檔 65.7 KB、可離線、含決策器與自動生成流程圖）
+- [x] 階段四：PowerPoint 簡報 **53 張**（含免疫橋接教學模組 7 頁）
+- [x] 階段五：A4 病人衛教單張 —— **內容完成，版面待壓縮**（見下）
+- [ ] 階段六：三份產出交付前總驗收（依規格卡驗收條件逐條檢查）
+- [ ] **待辦：衛教單張版面壓縮至 A4 單頁**（目前內容高約 683mm ≈ 2.3 頁）
+- [ ] 待辦：`.pptx` 複製一份到 OneDrive 備份（依檔案放置約定，不進 git）
 
 ## 資料夾結構
 
@@ -32,8 +34,18 @@ C:\projects\pneumonia-clinic\
 ├── .gitignore
 ├── rdq\
 │   └── RDQ-spec-pneumococcal-vaccine-policy-20260807.md   # 已確認的需求規格卡
-├── data\                        # 查證來源摘錄、規則表（JSON/MD），全部可公開
-├── src\                         # HTML 報告與衛教單張原始檔
+├── data\                        # 查證來源摘錄 01–07，全部附出處與查詢日
+├── src\
+│   ├── rules.json               # ★ 單一真相來源（公費資格、間隔、警示、ACIP 對照、來源位階）
+│   ├── engine.js                # 決策引擎（純函式，瀏覽器與 Node 共用）
+│   ├── engine.test.js           # 窮舉測試：node src/engine.test.js
+│   ├── report.template.html     # HTML 報告樣板（含注入標記）
+│   ├── leaflet.template.html    # 病人衛教單張樣板
+│   ├── build.js                 # 建置：注入 rules/engine → output（含衛教單張術語檢查）
+│   ├── deck.js                  # 簡報產生器：node src/deck.js
+│   ├── deck_qa.py              # 版面＋出處稽核（無 LibreOffice 環境的替代 QA）
+│   ├── consistency.py           # 跨產出數字一致性與用語紅線掃描
+│   └── serve.js                 # 本機預覽伺服器（僅開發用）
 └── output\                      # 產出物（*.pptx 不進 git，見下）
 ```
 
