@@ -74,3 +74,28 @@ console.log('✅ 建置完成');
 console.log('   檔案：' + OUT_FILE);
 console.log('   大小：' + kb + ' KB（單檔、無外部相依）');
 console.log('   規則表版本：' + rules.meta.version + '（更新日 ' + rules.meta.updated + '）');
+
+/* ── 病人衛教單張（A4 可列印，靜態內容、無需注入規則表）── */
+const LEAFLET_SRC = path.join(SRC, 'leaflet.template.html');
+const LEAFLET_OUT = path.join(OUT_DIR, '肺炎鏈球菌疫苗病人衛教單張.html');
+if (fs.existsSync(LEAFLET_SRC)) {
+  const leaflet = fs.readFileSync(LEAFLET_SRC, 'utf8');
+
+  // 衛教單張不得出現血清型編號與未解釋的英文縮寫（規格卡驗收條件）
+  const body = leaflet.replace(/<style[\s\S]*?<\/style>/g, '');
+  const banned = [];
+  const seroPattern = /(?:^|[^\d\w])(?:6A|6B|9V|18C|19A|19F|22F|23F|33F|15A|15B|15C|16F|23A|23B|24F|35B|10A|11A|12F|9N|17F|20A)(?![\w])/g;
+  const seroHits = (body.match(seroPattern) || []).map((s) => s.trim());
+  if (seroHits.length) banned.push('血清型編號：' + [...new Set(seroHits)].join('、'));
+  ['IPD', 'OPA', 'VE', 'CAPiTA', 'ACIP', 'PCV13', 'PCV20', 'PCV21', 'PPV23', 'PCV15'].forEach((t) => {
+    if (new RegExp('(?:^|[^\\w])' + t + '(?![\\w])').test(body)) banned.push('未解釋縮寫：' + t);
+  });
+  if (banned.length) {
+    console.error('✗ 衛教單張含不應出現的專業術語：\n  ' + banned.join('\n  '));
+    process.exit(1);
+  }
+
+  fs.writeFileSync(LEAFLET_OUT, leaflet, 'utf8');
+  const lkb = (Buffer.byteLength(leaflet, 'utf8') / 1024).toFixed(1);
+  console.log('✅ 衛教單張：' + LEAFLET_OUT + '（' + lkb + ' KB，A4 可列印）');
+}
