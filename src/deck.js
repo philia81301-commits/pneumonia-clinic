@@ -700,18 +700,44 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 {
   const s = slide({ dark: true });
   s.addText('05', { x: M, y: 2.3, w: 2.0, h: 1.0, fontFace: F, fontSize: 54, bold: true, color: '4E93A8' });
-  s.addText('公費政策與高風險分層', {
+  s.addText('誰該打、什麼時候打', {
     x: M, y: 3.3, w: CW, h: 0.9, fontFace: F, fontSize: 40, bold: true, color: 'FFFFFF'
   });
-  s.addText('門診最常給錯答案的地方', {
+  s.addText('一條決策鏈，三個步驟', {
     x: M, y: 4.2, w: CW, h: 0.6, fontFace: F, fontSize: 22, bold: true, color: 'A8CBD7'
   });
-  note(s, '');
+  note(s, '接下來十頁是同一條決策鏈，不要拆開看。');
 }
 
 {
   const s = slide();
-  head(s, '19–64 歲公費高風險：僅這 6 類', '公費政策');
+  head(s, '病人走進診間，只問三個問題', '決策總覽');
+  const steps = [
+    ['1', '符不符合公費？', '看年齡、身分、適應症', C.deep],
+    ['2', '過去打過什麼？', '決定要不要等、等多久', C.warn],
+    ['3', '打哪一支？', 'PCV20 或 PCV21 二擇一', C.ok]
+  ];
+  steps.forEach((st, i) => {
+    const y = 2.2 + i * 1.45;
+    card(s, M, y, CW, 1.2);
+    numCircle(s, M + 0.32, y + 0.28, 0.66, st[0], st[3]);
+    s.addText(st[1], {
+      x: M + 1.2, y: y + 0.14, w: 4.6, h: 0.5, fontFace: F, fontSize: 26, bold: true,
+      color: st[3], margin: 0
+    });
+    s.addText(st[2], {
+      x: M + 1.2, y: y + 0.64, w: CW - 1.5, h: 0.45, fontFace: F, fontSize: 18,
+      color: C.ink2, margin: 0
+    });
+  });
+  callout(s, M, 6.05, CW, 0.75, '接下來每一頁的標題都會標明它屬於哪一個步驟', 'info', 19);
+  foot(s, '');
+  note(s, '這頁是全場的骨架，後面每一頁都掛回這三個問題。');
+}
+
+{
+  const s = slide();
+  head(s, '19–64 歲公費高風險：僅這 6 類', '步驟 1　公費資格');
   const items = ['脾臟功能缺損', '先天或後天免疫功能不全', '人工耳植入',
                  '腦脊髓液滲漏', '一年內免疫抑制劑或放射治療之惡性腫瘤', '器官移植者'];
   items.forEach((t, i) => {
@@ -730,7 +756,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '高風險必須分兩層看', '公費政策');
+  head(s, '高風險必須分兩層看', '步驟 1　公費資格');
   const rows = [
     [th('層'), th('適應症'), th('19–64 歲'), th('65 歲以上')],
     [td('第一層\n公費高風險', { bold: true }),
@@ -747,7 +773,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '分界是年齡，不是疾病', '公費政策');
+  head(s, '分界是年齡，不是疾病', '步驟 1　公費資格');
   card(s, M, 2.3, 5.9, 2.2, C.badBg);
   s.addText([
     { text: '62 歲　糖尿病', options: { breakLine: true, fontSize: 28, color: C.ink } },
@@ -766,39 +792,10 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   note(s, '這一頁是整場最實用的一頁。');
 }
 
+/* 步驟 2　銜接規則：依公告原文結構拆成 4 頁 */
 {
   const s = slide();
-  head(s, '台美差異速查', '公費政策');
-  const rows = [
-    [th('項目'), th('台灣公費'), th('美國 ACIP')],
-    [td('起始年齡'), td('65 歲', { bold: true, color: C.bad }), td('50 歲', { bold: true, color: C.ok })],
-    [td('高風險定義'), td('窄：僅 6 類'), td('寬：另含糖尿病、慢性心肺肝腎病、吸菸')],
-    [td('PPV23'), td('不再提供公費', { bold: true }), td('仍為方案二的一部分')],
-    [td('50–64 歲一般成人'), td('不符公費', { bold: true, color: C.bad }), td('建議接種', { bold: true, color: C.ok })]
-  ];
-  table(s, M, 2.15, CW, rows, [3.4, 4.2, CW - 7.6], 20, 3.05);
-  callout(s, M, 5.4, CW, 1.15, '門診最常見的落差：50–64 歲有糖尿病或 COPD 的病人', 'warn', 23);
-  foot(s, 'ACIP：MMWR Recomm Rep 2023;72(3):1-39；2024 擴大至 ≥50 歲（PMID 39773952）');
-  note(s, '');
-}
-
-/* ═══════════ 七、實務操作 ═══════════ */
-{
-  const s = slide({ dark: true });
-  s.addText('06', { x: M, y: 2.3, w: 2.0, h: 1.0, fontFace: F, fontSize: 54, bold: true, color: '4E93A8' });
-  s.addText('門診實務', {
-    x: M, y: 3.3, w: CW, h: 0.9, fontFace: F, fontSize: 40, bold: true, color: 'FFFFFF'
-  });
-  s.addText('銜接規則與合併施打', {
-    x: M, y: 4.2, w: CW, h: 0.6, fontFace: F, fontSize: 22, bold: true, color: 'A8CBD7'
-  });
-  note(s, '');
-}
-
-/* 銜接規則依公告原文結構拆成 4 頁：對象一 → 對象二（一）（二）→ 但書 → （三）*/
-{
-  const s = slide();
-  head(s, '公告把接種資格分成兩大類', '門診實務｜銜接規則');
+  head(s, '公告把接種資格分成兩大類', '步驟 2　過去打過什麼');
   const cw2 = 5.75;
 
   card(s, M, 2.15, cw2, 4.4, C.okBg);
@@ -829,7 +826,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '對象二（一）（二）：只打過一種疫苗', '門診實務｜銜接規則');
+  head(s, '對象二（一）（二）：只打過一種疫苗', '步驟 2　過去打過什麼');
   const rows = [
     [th('情形'), th('過去接種史'), th('間隔要求')],
     [td('（一）', { bold: true, color: C.deep }), td('僅接種過 23 價疫苗'), td('≥ 1 年', { bold: true })],
@@ -845,7 +842,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '（二）的但書：誰適用 8 週', '門診實務｜銜接規則');
+  head(s, '（二）的但書：誰適用 8 週', '步驟 2　過去打過什麼');
   const items = ['19–64 歲 IPD 高風險對象', '65 歲以上機構住民', '65 歲以上洗腎患者'];
   items.forEach((t, i) => {
     const y = 2.3 + i * 1.25;
@@ -863,32 +860,82 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '對象二（三）：已完整接種兩劑者', '門診實務｜銜接規則');
-  s.addText('曾完整接種 13 價（或 15 價）＋ 23 價各 1 劑', {
-    x: M, y: 2.0, w: CW, h: 0.5, fontFace: F, fontSize: 21, bold: true, color: C.ink2 });
-  const cw2 = 5.75;
+  head(s, '對象二（三）：三個條件缺一不可', '步驟 2　過去打過什麼');
+  s.addText('已完整接種 13 價（或 15 價）＋ 23 價各 1 劑者，要再接種 1 劑必須同時符合：', {
+    x: M, y: 1.95, w: CW, h: 0.5, fontFace: F, fontSize: 20, bold: true, color: C.ink2 });
 
-  card(s, M, 2.6, cw2, 3.3, C.okBg);
-  s.addText('先前為 19–64 歲\nIPD 高風險對象', {
-    x: M + 0.35, y: 2.8, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 21, bold: true, color: C.ok });
-  s.addText('滿 65 歲（含）\n且距前劑 ≥ 5 年', {
-    x: M + 0.35, y: 3.85, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 24, bold: true, color: C.ink });
-  s.addText('可再接種 1 劑', {
-    x: M + 0.35, y: 4.95, w: cw2 - 0.7, h: 0.65, fontFace: F, fontSize: 26, bold: true, color: C.ok });
+  const cw3 = 3.6, gap = 0.55;
+  const conds = [
+    ['1', '先前為\n19–64 歲\nIPD 高風險對象', C.deep],
+    ['2', '已滿\n65 歲（含）', C.bad],
+    ['3', '與前劑\n間隔滿 5 年', C.deep]
+  ];
+  conds.forEach((cd, i) => {
+    const x = M + i * (cw3 + gap);
+    card(s, x, 2.55, cw3, 2.85, i === 1 ? C.badBg : C.soft);
+    numCircle(s, x + cw3 / 2 - 0.33, 2.78, 0.66, cd[0], cd[2]);
+    s.addText(cd[1], {
+      x: x + 0.2, y: 3.55, w: cw3 - 0.4, h: 1.65, fontFace: F, fontSize: 23, bold: true,
+      color: cd[2], align: 'center', valign: 'top', margin: 0
+    });
+    if (i < 2) {
+      s.addText('＋', {
+        x: x + cw3 - 0.2, y: 3.5, w: gap + 0.4, h: 0.6, fontFace: F, fontSize: 26, bold: true,
+        color: C.ink2, align: 'center', valign: 'middle', margin: 0
+      });
+    }
+  });
 
-  card(s, M + cw2 + 0.4, 2.6, cw2, 3.3);
-  const x2 = M + cw2 + 0.75;
-  s.addText('非上述身分者', {
-    x: x2, y: 2.8, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 21, bold: true, color: C.ink2 });
-  s.addText('視為\n已完成接種', {
-    x: x2, y: 3.85, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 26, bold: true, color: C.ink });
-  s.addText('不再追加', {
-    x: x2, y: 4.95, w: cw2 - 0.7, h: 0.65, fontFace: F, fontSize: 26, bold: true, color: C.ink2 });
-
-  callout(s, M, 6.05, CW, 0.8,
-    '關鍵限定：5 年追加只給「先前為 19–64 歲 IPD 高風險對象」，不是所有 65 歲以上', 'bad', 19);
+  callout(s, M, 5.65, CW, 1.25,
+    '三項是「同時成立」，缺一即視為已完成接種、不再追加。\n最容易漏掉的是第 2 項：即使先前是 IPD 高風險對象，未滿 65 歲仍不可追加。', 'bad', 20);
   foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜查詢日 2026-08-08');
-  note(s, '這一條最容易讀成「任何 65 歲以上打過兩劑都可以再打」，公告原文有身分限定。');
+  note(s, '這一條最容易讀成「任何 65 歲以上打過兩劑都可以再打」，或「高風險就可以再打」。三個條件是 AND，不是 OR，而且 65 歲那條沒有例外。');
+}
+
+/* 步驟 3 */
+{
+  const s = slide();
+  head(s, '打哪一支？', '步驟 3　選擇疫苗');
+  card(s, M, 2.3, CW, 1.9, C.okBg);
+  s.addText('PCV20　或　PCV21', {
+    x: M, y: 2.3, w: CW, h: 1.9, fontFace: F, fontSize: 46, bold: true,
+    color: C.ok, align: 'center', valign: 'middle', margin: 0 });
+  callout(s, M, 4.5, CW, 1.0,
+    '疾管署表示兩者無優劣差異，由民眾自由選擇其一接種', 'info', 22);
+  callout(s, M, 5.7, CW, 1.15,
+    '若病人問「差在哪」：PCV21 涵蓋 15A、15C、23A、35B 等台灣近年上升的血清型；\nPCV20 涵蓋 1、4、5、6B 等已因幼兒接種而大幅減少的血清型', 'warn', 18);
+  foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜查詢日 2026-08-08');
+  note(s, '官方立場是無優劣、自由選擇。要補充差異時只講血清型組成，不要講保護力高低。');
+}
+
+/* 補充：台美差異（不屬於決策鏈，放在三步驟之後） */
+{
+  const s = slide();
+  head(s, '台美差異速查', '補充｜非決策步驟');
+  const rows = [
+    [th('項目'), th('台灣公費'), th('美國 ACIP')],
+    [td('起始年齡'), td('65 歲', { bold: true, color: C.bad }), td('50 歲', { bold: true, color: C.ok })],
+    [td('高風險定義'), td('窄：僅 6 類'), td('寬：另含糖尿病、慢性心肺肝腎病、吸菸')],
+    [td('PPV23'), td('不再提供公費', { bold: true }), td('仍為方案二的一部分')],
+    [td('50–64 歲一般成人'), td('不符公費', { bold: true, color: C.bad }), td('建議接種', { bold: true, color: C.ok })]
+  ];
+  table(s, M, 2.15, CW, rows, [3.4, 4.2, CW - 7.6], 20, 3.05);
+  callout(s, M, 5.4, CW, 1.15, '門診最常見的落差：50–64 歲有糖尿病或 COPD 的病人', 'warn', 23);
+  foot(s, 'ACIP 為國際指引，非疾管署公告內容｜MMWR Recomm Rep 2023;72(3):1-39；PMID 39773952');
+  note(s, '這頁是比較，不是台灣的規定。決定公費與否一律看前面三個步驟。');
+}
+
+/* ═══════════ 六、合併施打 ═══════════ */
+{
+  const s = slide({ dark: true });
+  s.addText('06', { x: M, y: 2.3, w: 2.0, h: 1.0, fontFace: F, fontSize: 54, bold: true, color: '4E93A8' });
+  s.addText('與其他疫苗的合併施打', {
+    x: M, y: 3.3, w: CW, h: 0.9, fontFace: F, fontSize: 40, bold: true, color: 'FFFFFF'
+  });
+  s.addText('九種疫苗、三個例外', {
+    x: M, y: 4.2, w: CW, h: 0.6, fontFace: F, fontSize: 22, bold: true, color: 'A8CBD7'
+  });
+  note(s, '');
 }
 
 {
