@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "updated": "2026-08-07",
+    "policyEffectiveFrom": "2026-08-10",
+    "description": "台灣成人肺炎鏈球菌疫苗接種決策規則表。決策器與補接種流程圖共用此檔，不得各自實作。",
+    "sources": {
+      "tw": {
+        "label": "衛生福利部疾病管制署 致醫界通函第612號（2026-07-28）",
+        "url": "https://www.cdc.gov.tw/Bulletin/Detail/314drgt9vg05Js-q1Wgdrw?typeid=48",
+        "retrieved": "2026-08-07"
+      },
+      "twBulletin": {
+        "label": "疾管署新聞稿：成人公費肺鏈疫苗自2026-08-10起升級",
+        "url": "https://www.cdc.gov.tw/Bulletin/Detail/vwMq9VkXIaV7FHyJgpk-5w?typeid=9",
+        "retrieved": "2026-08-07"
+      },
+      "acip": {
+        "label": "ACIP 成人肺炎鏈球菌疫苗建議（MMWR Recomm Rep 2023;72(3):1-39；2024 擴大至≥50歲 PMID 39773952），經內科學誌 2025;36(6):381-386 表一整理",
+        "url": "https://www.tsim.org.tw/ehc-tsim/s/viewFile?documentId=8108267ec5b3450bb1ac8db3193e1316",
+        "retrieved": "2026-08-07"
+      }
+    }
+  },
+
+  "ageRule": {
+    "method": "yearDifference",
+    "formula": "currentYear - birthYear",
+    "countsMonthDay": false,
+    "note": "以西元年份相減，不計月日（使用者指定）。"
+  },
+
+  "vaccines": {
+    "offered": ["PCV20", "PCV21"],
+    "choiceNote": "疾管署表示 PCV20 與 PCV21 無優劣差異，由民眾自由選擇其一接種。",
+    "withdrawn": {
+      "PPV23": "新制實施後不再提供公費接種，疾管署辦理回收作業。"
+    }
+  },
+
+  "fundedCategories": [
+    {
+      "id": "elder65",
+      "label": "65 歲（含）以上長者",
+      "test": "age >= 65"
+    },
+    {
+      "id": "indigenous55",
+      "label": "55–64 歲原住民",
+      "test": "isIndigenous && age >= 55 && age <= 64"
+    },
+    {
+      "id": "highrisk19",
+      "label": "19–64 歲 IPD 高風險對象",
+      "test": "age >= 19 && age <= 64 && fundedRisk.length > 0",
+      "note": "應準備診斷書等佐證資料，或由醫師依健保就醫資料、病歷評估後接種。"
+    }
+  ],
+
+  "fundedRiskConditions": [
+    { "id": "asplenia",        "label": "脾臟功能缺損" },
+    { "id": "immunodeficiency","label": "先天或後天免疫功能不全" },
+    { "id": "cochlearImplant", "label": "人工耳植入" },
+    { "id": "csfLeak",         "label": "腦脊髓液滲漏" },
+    { "id": "malignancy",      "label": "一年內接受免疫抑制劑或放射治療的惡性腫瘤者" },
+    { "id": "transplant",      "label": "器官移植者" }
+  ],
+
+  "clinicalRiskConditions": [
+    { "id": "diabetes",     "label": "糖尿病" },
+    { "id": "heartDisease", "label": "慢性心臟病" },
+    { "id": "lungDisease",  "label": "慢性肺病／COPD" },
+    { "id": "asthma",       "label": "氣喘" },
+    { "id": "liverDisease", "label": "慢性肝病與肝硬化" },
+    { "id": "kidneyDisease","label": "慢性腎病與腎病症候群" },
+    { "id": "alcohol",      "label": "酒精使用障礙" },
+    { "id": "smoking",      "label": "吸菸者" }
+  ],
+
+  "historyOptions": [
+    { "id": "none",        "label": "未曾接種任何肺炎鏈球菌疫苗" },
+    { "id": "ppv23",       "label": "只打過 PPV23（23 價）" },
+    { "id": "pcv13",       "label": "只打過 PCV13（13 價）" },
+    { "id": "pcv15",       "label": "只打過 PCV15（15 價）" },
+    { "id": "pcv13_ppv23", "label": "打過 PCV13 ＋ PPV23（舊制完整兩劑）" },
+    { "id": "pcv15_ppv23", "label": "打過 PCV15 ＋ PPV23" },
+    { "id": "pcv20",       "label": "已打過 PCV20（20 價）" },
+    { "id": "pcv21",       "label": "已打過 PCV21（21 價）" }
+  ],
+
+  "intervalRules": {
+    "none":        { "months": 0,  "basis": "從未接種肺鏈疫苗者無間隔需求" },
+    "ppv23":       { "months": 12, "basis": "僅接種23價疫苗且間隔至少1年者" },
+    "pcv13":       { "months": 12, "shortMonths": 2, "basis": "僅接種13或15價疫苗且間隔至少1年者（IPD高風險對象或65歲以上機構住民及洗腎患者間隔至少8週）" },
+    "pcv15":       { "months": 12, "shortMonths": 2, "basis": "僅接種13或15價疫苗且間隔至少1年者（IPD高風險對象或65歲以上機構住民及洗腎患者間隔至少8週）" },
+    "pcv13_ppv23": { "months": 60, "requiresAge65": true, "basis": "曾完整接種13價＋23價各1劑者，滿65歲且與前劑間隔滿5年後可追加1劑" },
+    "pcv15_ppv23": { "complete": true, "basis": "視為已完成接種" },
+    "pcv20":       { "complete": true, "basis": "視為已完成接種" },
+    "pcv21":       { "complete": true, "basis": "視為已完成接種" }
+  },
+
+  "shortIntervalEligibility": {
+    "months": 2,
+    "label": "8 週",
+    "conditions": [
+      "19–64 歲 IPD 高風險對象",
+      "65 歲以上機構住民",
+      "65 歲以上洗腎患者"
+    ],
+    "test": "(age >= 19 && age <= 64 && fundedRisk.length > 0) || (age >= 65 && (isInstitutional || isDialysis))"
+  },
+
+  "warnings": {
+    "menacwyD": {
+      "triggerRisks": ["asplenia", "immunodeficiency"],
+      "text": "無脾症／脾臟功能缺損或 HIV 感染者，不可與 MenACWY-D（Menactra 廠牌）同時接種；應先接種肺炎鏈球菌結合型疫苗，至少 4 週後再接種 Menactra。此限制不適用於 MenACWY-CRM（Menveo）。",
+      "note": "此規定原文係針對 PCV13，是否延伸至 PCV20／PCV21 尚待確認。"
+    },
+    "documentation": {
+      "text": "19–64 歲 IPD 高風險對象需準備診斷書等佐證資料，或由醫師依健保就醫資料、病歷評估後接種。"
+    },
+    "selfPay": {
+      "text": "本族群不符現行公費資格，如欲接種需自費。文獻顯示具 2 個以上共病症者，其肺炎風險與高風險患者相當或甚至更高，建議主動評估。",
+      "source": "Pelton SI, et al. BMC Infect Dis 2015;15:470"
+    },
+    "boosterAmbiguity": {
+      "text": "已完整接種 PCV13＋PPV23 者的追加規定，通函第 612 號敘述限於「19–64 歲 IPD 高風險對象」，新聞稿附表則未特別限定身分。實際資格請以合約院所認定為準。"
+    },
+    "coadmin": {
+      "text": "肺炎鏈球菌疫苗為不活化疫苗，與流感、COVID-19、RSV、Tdap、A 肝、B 肝、Shingrix 及 MMR、水痘等疫苗均可同日於不同部位接種，無間隔限制。合併施打規定非疾管署公告內容，係依國際指引與仿單整理。"
+    }
+  },
+
+  "acipComparison": {
+    "startAge": 50,
+    "twStartAge": 65,
+    "note": "美國 ACIP 建議 ≥50 歲成人接種，且高風險定義較寬（含糖尿病、慢性心肺肝腎病、吸菸、酒精使用障礙）。台灣公費起始年齡為 65 歲，19–64 歲僅限 6 類 IPD 高風險對象。",
+    "schedule50plus": {
+      "none":        { "optionA": "PCV20 或 PCV21", "optionB": "PCV15，間隔至少 1 年後施打 PPSV23" },
+      "pcv15":       { "optionA": "間隔至少 1 年後施打 PPSV23" },
+      "pcv15_ppv23": { "optionA": "視為已完成接種" },
+      "pcv20":       { "optionA": "視為已完成接種" },
+      "pcv21":       { "optionA": "視為已完成接種" },
+      "ppv23":       { "optionA": "間隔至少 1 年後施打 PCV20 或 PCV21", "optionB": "間隔至少 1 年後施打 PCV15" },
+      "pcv13":       { "optionA": "間隔至少 1 年後施打 PCV20 或 PCV21" },
+      "pcv13_ppv23": { "optionA": "間隔至少 5 年後施打 PCV20 或 PCV21", "note": "指 65 歲前施打者" }
+    },
+    "scheduleHighRisk19to64": {
+      "none":        { "optionA": "PCV20 或 PCV21", "optionB": "PCV15，間隔至少 8 週後施打 PPSV23" },
+      "pcv15":       { "optionA": "間隔至少 8 週後施打 PPSV23" },
+      "pcv15_ppv23": { "optionA": "視為已完成接種" },
+      "pcv20":       { "optionA": "視為已完成接種" },
+      "pcv21":       { "optionA": "視為已完成接種" },
+      "ppv23":       { "optionA": "間隔至少 1 年後施打 PCV20 或 PCV21", "optionB": "間隔至少 1 年後施打 PCV15" },
+      "pcv13":       { "optionA": "間隔至少 1 年後施打 PCV20 或 PCV21" },
+      "pcv13_ppv23": { "optionA": "間隔至少 5 年後施打 PCV20 或 PCV21" }
+    }
+  },
+
+  "disclaimer": "本工具依 2026-08-10 起實施之疾管署公費政策與美國 ACIP 建議整理，僅供臨床參考，不取代醫師之個別臨床判斷；實際公費資格以合約醫療院所認定為準。"
+}
