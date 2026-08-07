@@ -40,9 +40,16 @@
 
   "ageRule": {
     "method": "yearDifference",
-    "formula": "currentYear - birthYear",
+    "formula": "接種年 − 出生年",
     "countsMonthDay": false,
-    "note": "以西元年份相減，不計月日（使用者指定）。"
+    "official": "公告逐字：「即以『接種年』減『出生年』計算大於等於 65 歲者」——不計月日。",
+    "rocOffset": 1911,
+    "examples2026": {
+      "note": "以民國 115 年（2026）為例",
+      "elder65": "50 年次（含）以前出生，即西元 1961 年（含）以前",
+      "indigenous55to64": "民國 60 年（含）以前出生，即西元 1971 年（含）以前",
+      "adult19to64": "民國 51 年（含）以後且 96 年（含）以前出生，即西元 1962–2007 年"
+    }
   },
 
   "vaccines": {
@@ -73,13 +80,13 @@
   ],
 
   "fundedRiskConditions": [
-    { "id": "asplenia",        "label": "脾臟功能缺損" },
-    { "id": "immunodeficiency","label": "先天或後天免疫功能不全" },
-    { "id": "cochlearImplant", "label": "人工耳植入" },
-    { "id": "csfLeak",         "label": "腦脊髓液滲漏" },
-    { "id": "malignancy",      "label": "一年內接受免疫抑制劑或放射治療的惡性腫瘤者" },
-    { "id": "transplant",      "label": "器官移植者" }
+    { "no": 1, "id": "asplenia",         "label": "脾臟功能缺損" },
+    { "no": 2, "id": "immunodeficiency", "label": "先天或後天免疫功能不全" },
+    { "no": 3, "id": "cochlearImplant",  "label": "人工耳植入" },
+    { "no": 4, "id": "csfLeak",          "label": "腦脊髓液滲漏" },
+    { "no": 5, "id": "malignancyOrTransplant", "label": "「一年內」接受免疫抑制劑或放射治療的惡性腫瘤者及器官移植者" }
   ],
+  "fundedRiskNote": "公告逐字列為 5 項；第 5 項將惡性腫瘤者與器官移植者併為同一項，且限「一年內」接受免疫抑制劑或放射治療者。",
 
   "clinicalRiskConditions": [
     { "id": "diabetes",     "label": "糖尿病" },

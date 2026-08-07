@@ -59,6 +59,48 @@ def collect(shape, out, prefix=''):
     out.append(shape)
 
 
+# ── 出處稽核 ──
+# 「資料來源很重要」：凡陳述事實數字或政策規定的投影片，都必須帶出處。
+# 下列關鍵詞代表該頁有事實主張，必須在頁面文字中找到來源標記。
+FACT_MARKERS = ('%', '歲', '價', '劑', '年', '週', 'PMID', 'CI', '例')
+SOURCE_MARKERS = ('疾管署', '通函', '接種須知', '衛福部', '健保署', '內科學誌',
+                  'PMID', 'Lancet', 'NEJM', 'MMWR', 'ACIP', 'Yellow Book',
+                  'J Antimicrob', 'BMC', 'Hum Vaccin', 'Vaccine', 'JMII',
+                  'Platt', 'Chiang', 'Huang', 'Pelton', 'clinicaltrials',
+                  '查詢日', '出處', '來源')
+# 純結構頁（封面、章節分隔、總覽、方法論宣告）不要求出處
+EXEMPT_KEYWORDS = ('章節', '重點', '決策總覽', '只問三個問題', '來源位階',
+                   '主要出處', '教學模組', '用語紅線', '破題', '類比')
+
+
+def audit_sources(prs):
+    """回傳缺少出處的投影片清單。"""
+    missing = []
+    for idx, slide in enumerate(prs.slides, 1):
+        texts = []
+        for sh in slide.shapes:
+            if sh.has_text_frame and sh.text_frame.text.strip():
+                texts.append(sh.text_frame.text)
+            if getattr(sh, 'has_table', False):
+                for r in sh.table.rows:
+                    for c in r.cells:
+                        if c.text.strip():
+                            texts.append(c.text)
+        blob = ' '.join(texts)
+        if not blob.strip():
+            continue
+        # 章節封面／過場頁：文字量極少，不承載事實主張
+        if len(blob.replace(' ', '')) < 40:
+            continue
+        if any(k in blob for k in EXEMPT_KEYWORDS):
+            continue
+        if not any(k in blob for k in FACT_MARKERS):
+            continue
+        if not any(k in blob for k in SOURCE_MARKERS):
+            missing.append((idx, blob.replace('\n', ' ')[:46]))
+    return missing
+
+
 def main(path):
     prs = Presentation(path)
     SW, SH = inches(prs.slide_width), inches(prs.slide_height)
@@ -110,9 +152,22 @@ def main(path):
                                    '「%s」×「%s」重疊 %.2f×%.2f"' %
                                    (a[4][:16].replace('\n', ' '), b[4][:16].replace('\n', ' '), ox, oy)))
 
-    if not issues:
+    missing_src = audit_sources(prs)
+
+    if not issues and not missing_src:
         print('✅ 版面稽核全部通過（邊界／溢框／留白／重疊）')
+        print('✅ 出處稽核全部通過（每張有事實主張的投影片都帶來源）')
         return 0
+
+    if missing_src:
+        print('【MISSING_SOURCE】%d 張投影片有事實主張但未標出處' % len(missing_src))
+        for idx, txt in missing_src:
+            print('  第 %2d 張　%s' % (idx, txt))
+        print()
+
+    if not issues:
+        print('✅ 版面稽核通過（邊界／溢框／留白／重疊）')
+        return 1
 
     by_kind = {}
     for it in issues:

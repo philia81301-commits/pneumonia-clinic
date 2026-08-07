@@ -211,14 +211,15 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   head(s, '公費對象：三類', '政策');
   const rows = [
     [th('類別'), th('條件')],
-    [td('長者'), td('65 歲（含）以上', { bold: true })],
-    [td('原住民'), td('55–64 歲', { bold: true })],
-    [td('IPD 高風險'), td('19–64 歲，符合 6 類適應症之一', { bold: true })]
+    [td('長者'), td('65 歲（含）以上', { bold: true, color: C.deep })],
+    [td('原住民'), td('55–64 歲', { bold: true, color: C.deep })],
+    [td('IPD 高風險'), td('19–64 歲，且符合公告列舉的 5 項之一：\n① 脾臟功能缺損　② 先天或後天免疫功能不全　③ 人工耳植入\n④ 腦脊髓液滲漏　⑤「一年內」接受免疫抑制劑或放射治療的惡性腫瘤者及器官移植者', { bold: true, color: C.deep })]
   ];
-  table(s, M, 2.15, CW, rows, [3.6, CW - 3.6], 23, 2.75);
-  callout(s, M, 5.15, CW, 1.4, '19–64 歲高風險對象需備診斷書等佐證，\n或由醫師依健保就醫資料評估', 'info', 22);
-  foot(s, '疾管署致醫界通函第 612 號｜查詢日 2026-08-07');
-  note(s, '注意這三類，後面會看到第三類的清單比美國窄很多。');
+  table(s, M, 2.1, CW, rows, [2.9, CW - 2.9], 18, 3.3);
+  callout(s, M, 5.6, CW, 1.3,
+    '「IPD 高風險對象」僅限上列 5 項。\n糖尿病、COPD、慢性肝腎疾病、吸菸等不在其中，65 歲前需自費。', 'bad', 21);
+  foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）｜查詢日 2026-08-08');
+  note(s, '這裡就要把 5 項講明白。「高風險」三個字很容易讓人自動聯想到糖尿病與 COPD，那是錯的，而且會一路錯到門診。第 5 項是把惡性腫瘤與器官移植併為同一項，且限一年內接受治療者。');
 }
 
 /* ═══════════ 二、台灣流病 ═══════════ */
@@ -485,7 +486,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
      td('PCV15、PCV20、PCV21', { bold: true, color: C.bad })]
   ];
   table(s, M, 2.15, CW, rows, [2.4, (CW - 2.4) / 2, (CW - 2.4) / 2], 20, CONTENT_BOTTOM - 2.15);
-  foot(s, 'OPA：調理吞噬活性，測血清能否促使白血球吞噬並殺死細菌，是成人試驗的首選終點');
+  foot(s, 'OPA：調理吞噬活性，是成人試驗首選終點｜依據 V116 與 PCV20 臨床試驗計畫書（clinicaltrials.gov）｜查詢日 2026-08-07');
   note(s, 'OPA 比單純測 IgG 更接近真實殺菌功能。');
 }
 
@@ -521,7 +522,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     });
   });
   callout(s, M, 5.75, CW, 0.95, '這是 FDA、EMA 都接受的法規既定路徑，不是廠商規避試驗', 'ok');
-  foot(s, '');
+  foot(s, 'An overview of the clinical development of PCV20 in adults. Hum Vaccin Immunother 2026｜查詢日 2026-08-07');
   note(s, '強調最後一句，避免聽眾誤以為新疫苗證據薄弱。');
 }
 
@@ -737,7 +738,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '19–64 歲公費高風險：僅這 6 類', '步驟 1　公費資格');
+  head(s, '19–64 歲公費高風險：僅這 5 項', '步驟 1　公費資格');
   const items = ['脾臟功能缺損', '先天或後天免疫功能不全', '人工耳植入',
                  '腦脊髓液滲漏', '一年內免疫抑制劑或放射治療之惡性腫瘤', '器官移植者'];
   items.forEach((t, i) => {
@@ -751,7 +752,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   });
   callout(s, M, 5.85, CW, 0.85, '這份清單比美國 ACIP 窄得多——糖尿病、COPD 都不在其中', 'warn');
   foot(s, '疾管署致醫界通函第 612 號逐字清單｜查詢日 2026-08-07');
-  note(s, '請同仁記住這 6 類，因為門診最常被問的其實是不在清單上的那些病。');
+  note(s, '請同仁記住這 5 項，因為門診最常被問的其實是不在清單上的那些病。');
 }
 
 {
@@ -792,7 +793,29 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   note(s, '這一頁是整場最實用的一頁。');
 }
 
-/* 步驟 2　銜接規則：依公告原文結構拆成 4 頁 */
+/* 步驟 2　銜接規則：先看公告原表，再逐項拆解 */
+{
+  const s = slide();
+  head(s, '公告原表：疫苗轉換之銜接原則', '步驟 2　過去打過什麼');
+  const rows = [
+    [th('接種對象'), th('過往接種史'), th('公費銜接疫苗')],
+    [td('• 65 歲（含）以上長者\n• 55–64 歲原住民\n• 19–64 歲 IPD\n　高風險對象',
+        { rowspan: 5, bold: true, color: C.deep, valign: 'middle' }),
+     td('從未接種'), td('PCV20 或 PCV21', { bold: true, color: C.ok })],
+    [td('僅接種 PPV23'), td('≥ 1 年　→　PCV20 或 PCV21', { bold: true })],
+    [td('僅接種 PCV13/15'), td('≥ 1 年 *　→　PCV20 或 PCV21', { bold: true })],
+    [td('PCV13/15 ＋ PPV23'), td('已完整接種，無需再接種', { bold: true, color: C.ink2 })],
+    [td('PCV20 或 PCV21'), td('已完整接種，無需再接種', { bold: true, color: C.ink2 })]
+  ];
+  table(s, M, 2.1, CW, rows, [3.1, 3.5, CW - 6.6], 17, 3.35);
+  callout(s, M, 5.6, CW, 1.3,
+    '* IPD 高風險對象、65 歲以上機構住民及洗腎患者為 ≥ 8 週\n' +
+    '註：19–64 歲 IPD 高風險對象，如於 65 歲前完整接種 PCV13/15＋PPV23，' +
+    '可於滿 65 歲（含）且與前劑間隔滿 5 年後，再追加接種 1 劑', 'warn', 17);
+  foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）伍、疫苗轉換之銜接原則｜查詢日 2026-08-08');
+  note(s, '這是公告原表，是本節的權威依據。先讓大家看過原表，後面四頁再逐項拆解。');
+}
+
 {
   const s = slide();
   head(s, '公告把接種資格分成兩大類', '步驟 2　過去打過什麼');
@@ -915,7 +938,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   const rows = [
     [th('項目'), th('台灣公費'), th('美國 ACIP')],
     [td('起始年齡'), td('65 歲', { bold: true, color: C.bad }), td('50 歲', { bold: true, color: C.ok })],
-    [td('高風險定義'), td('窄：僅 6 類'), td('寬：另含糖尿病、慢性心肺肝腎病、吸菸')],
+    [td('高風險定義'), td('窄：僅 5 項'), td('寬：另含糖尿病、慢性心肺肝腎病、吸菸')],
     [td('PPV23'), td('不再提供公費', { bold: true }), td('仍為方案二的一部分')],
     [td('50–64 歲一般成人'), td('不符公費', { bold: true, color: C.bad }), td('建議接種', { bold: true, color: C.ok })]
   ];
@@ -964,7 +987,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   s.addText('MMR　水痘　（免疫功能不全者禁用）', {
     x: M + 0.35, y: 4.85, w: CW - 0.7, h: 0.8, fontFace: F, fontSize: 22, bold: true, color: C.ink, valign: 'top'
   });
-  foot(s, 'Shingrix 為重組佐劑型、非活性疫苗｜RSV 併打時 RSV 與流感效價略低，不構成禁忌');
+  foot(s, 'CDC Yellow Book 2026｜SHINGRIX coadministration（GSK）｜非疾管署公告內容｜查詢日 2026-08-07');
   note(s, 'Shingrix 不是活性疫苗，這點常被搞錯。');
 }
 
@@ -1002,7 +1025,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
       color: C.ink2, margin: 0
     });
   });
-  foot(s, '第 1 條原文係針對 PCV13，是否延伸至 PCV20／PCV21 尚待確認');
+  foot(s, 'CDC Pink Book Ch.2、Ch.14｜非疾管署公告內容｜第 1 條原文係針對 PCV13，是否延伸至 PCV20／PCV21 尚待確認｜查詢日 2026-08-07');
   note(s, '第一條直接命中公費高風險族群，特別重要。');
 }
 
@@ -1028,7 +1051,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   });
   const pts = [
     ['1', '新制 8/10 上路', 'PCV20 或 PCV21 一劑搞定，PPV23 不再公費'],
-    ['2', '高風險分兩層', '19–64 歲僅 6 類公費；糖尿病、COPD 要自費'],
+    ['2', '高風險分兩層', '19–64 歲僅 5 項公費；糖尿病、COPD 要自費'],
     ['3', '效力數字要看證據等級', '新疫苗是免疫橋接核准，不可講成保護力較好']
   ];
   pts.forEach((p, i) => {

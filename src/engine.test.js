@@ -34,7 +34,7 @@ let combos = 0;
 for (let age = 18; age <= 95; age++) {
   const birthYear = YEAR - age;
   for (const isIndigenous of [false, true]) {
-    for (const fundedRisk of [[], ['asplenia'], ['cochlearImplant'], ['immunodeficiency', 'transplant']]) {
+    for (const fundedRisk of [[], ['asplenia'], ['cochlearImplant'], ['immunodeficiency', 'malignancyOrTransplant']]) {
       for (const clinicalRisk of [[], ['diabetes'], ['lungDisease', 'smoking']]) {
         for (const history of histories) {
           for (const monthsSinceLast of monthsOptions) {
