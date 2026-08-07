@@ -1001,6 +1001,24 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
+  head(s, '本簡報的來源位階原則', '附錄');
+  callout(s, M, 2.05, CW, 1.0,
+    '政策陳述一律以台灣官方公告為準：疾管署、衛福部、健保署', 'bad', 23);
+  const rows = [
+    [th('位階'), th('來源'), th('用途')],
+    [td('1', { bold: true, color: C.deep }), td('台灣官方公告\n致醫界通函、衛福部新聞稿、接種須知', { bold: true }),
+     td('公費資格、間隔規定、適應症認定——只引這一層', { bold: true, color: C.ok })],
+    [td('2', { bold: true, color: C.deep }), td('台灣學會共識與本土期刊'), td('臨床判斷與本土流病，非政策依據')],
+    [td('3', { bold: true, color: C.deep }), td('國際指引與期刊\nACIP、CDC Yellow Book、Lancet'), td('臨床證據；須標明「非疾管署公告內容」')],
+    [td('4', { bold: true, color: C.bad }), td('藥廠新聞稿、媒體、衛教網站'), td('不得作為政策或效力陳述的依據', { bold: true, color: C.bad })]
+  ];
+  table(s, M, 3.25, CW, rows, [1.1, 4.6, CW - 5.7], 16, 3.3);
+  foot(s, '官方文件互有出入時，以給醫事人員的正式函文為準並標示差異｜本主題主管機關為疾管署');
+  note(s, '這一頁是方法論宣告：政策的事只信官方公告，國際指引一律標示非官方。');
+}
+
+{
+  const s = slide();
   head(s, '主要出處', '附錄');
   const rows = [
     [th('內容'), th('出處')],
@@ -1018,9 +1036,23 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 }
 
 /* ─────────── 輸出 ─────────── */
-const OUT = path.join(__dirname, '..', 'output', '台灣成人肺炎鏈球菌疫苗簡報.pptx');
-fs.mkdirSync(path.dirname(OUT), { recursive: true });
-pres.writeFile({ fileName: OUT }).then(() => {
-  console.log('✅ 產生完成：' + OUT);
-  console.log('   投影片張數：' + n);
-});
+const OUT_DIR = path.join(__dirname, '..', 'output');
+const OUT = process.env.DECK_OUT || path.join(OUT_DIR, '台灣成人肺炎鏈球菌疫苗簡報.pptx');
+const FALLBACK = path.join(OUT_DIR, '台灣成人肺炎鏈球菌疫苗簡報_新版.pptx');
+fs.mkdirSync(OUT_DIR, { recursive: true });
+
+pres.writeFile({ fileName: OUT })
+  .then(() => {
+    console.log('✅ 產生完成：' + OUT);
+    console.log('   投影片張數：' + n);
+  })
+  .catch((err) => {
+    if (err.code !== 'EBUSY') throw err;
+    // 正式檔被 PowerPoint 開著時不硬蓋，改寫備用檔，避免整個建置中斷
+    return pres.writeFile({ fileName: FALLBACK }).then(() => {
+      console.log('⚠️  正式檔被開啟中（EBUSY），未覆蓋。');
+      console.log('   已改寫備用檔：' + FALLBACK);
+      console.log('   投影片張數：' + n);
+      console.log('   關閉 PowerPoint 後重跑 node src/deck.js 即可覆蓋正式檔。');
+    });
+  });
