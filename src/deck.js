@@ -124,26 +124,35 @@ function bullets(s, x, y, w, items, size) {
 }
 
 /** 提示框 */
-function callout(s, x, y, w, h, text, kind) {
+function callout(s, x, y, w, h, text, kind, size) {
   const map = { warn: [C.warnBg, C.warn], bad: [C.badBg, C.bad], ok: [C.okBg, C.ok], info: [C.soft, C.deep] };
   const pair = map[kind || 'info'];
   card(s, x, y, w, h, pair[0]);
   s.addText(text, {
-    x: x + 0.3, y: y + 0.18, w: w - 0.6, h: h - 0.36, fontFace: F, fontSize: 20, bold: true,
+    x: x + 0.3, y: y + 0.18, w: w - 0.6, h: h - 0.36, fontFace: F, fontSize: size || 20, bold: true,
     color: pair[1], valign: 'middle'
   });
 }
 
-/** 表格 */
-function table(s, x, y, w, rows, colW, fontSize) {
-  s.addTable(rows, {
+/**
+ * 表格
+ * totalH：表格要佔滿的總高度（英吋）。給定時平均分配列高，
+ *         讓有欄框的版面確實佔到約 70% 版面，而不是縮在中間。
+ */
+function table(s, x, y, w, rows, colW, fontSize, totalH) {
+  const opt = {
     x: x, y: y, w: w, colW: colW,
     fontFace: F, fontSize: fontSize || 16, color: C.ink,
     border: { type: 'solid', color: C.line, pt: 1 },
     fill: { color: 'FFFFFF' },
     valign: 'middle', autoPage: false
-  });
+  };
+  if (totalH) opt.rowH = totalH / rows.length;
+  s.addTable(rows, opt);
 }
+
+/** 內容區的標準底線：表格／卡片填滿到這裡，才達到約 70% 版面 */
+const CONTENT_BOTTOM = 6.55;
 function th(t) { return { text: t, options: { bold: true, fill: { color: C.soft }, color: C.deep } }; }
 function td(t, opt) { return { text: t, options: Object.assign({ bold: false }, opt || {}) }; }
 
@@ -167,6 +176,9 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   s.addText('PPV23 ｜ PCV13 ｜ PCV20 ｜ PCV21', {
     x: M, y: 4.1, w: 6.4, h: 0.72, fontFace: F, fontSize: 20, bold: true,
     color: 'FFFFFF', align: 'center', valign: 'middle', margin: 0
+  });
+  s.addText('高雄榮民總醫院　家庭醫學部　潘湘如 醫師', {
+    x: M, y: 5.15, w: CW, h: 0.5, fontFace: F, fontSize: 22, bold: true, color: 'FFFFFF'
   });
   s.addText('資料查證日 2026-08-07　｜　本簡報不使用任何病人資料', {
     x: M, y: 6.3, w: CW, h: 0.4, fontFace: F, fontSize: 14, color: '9DC2CE'
@@ -203,8 +215,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('原住民'), td('55–64 歲', { bold: true })],
     [td('IPD 高風險'), td('19–64 歲，符合 6 類適應症之一', { bold: true })]
   ];
-  table(s, M, 2.2, CW, rows, [3.4, CW - 3.4], 20);
-  callout(s, M, 4.9, CW, 0.85, '19–64 歲高風險對象需備診斷書等佐證，或由醫師依健保就醫資料評估', 'info');
+  table(s, M, 2.15, CW, rows, [3.6, CW - 3.6], 23, 2.75);
+  callout(s, M, 5.15, CW, 1.4, '19–64 歲高風險對象需備診斷書等佐證，\n或由醫師依健保就醫資料評估', 'info', 22);
   foot(s, '疾管署致醫界通函第 612 號｜查詢日 2026-08-07');
   note(s, '注意這三類，後面會看到第三類的清單比美國窄很多。');
 }
@@ -472,7 +484,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
      td('PCV13', { bold: true, color: C.deep }),
      td('PCV15、PCV20、PCV21', { bold: true, color: C.bad })]
   ];
-  table(s, M, 2.2, CW, rows, [2.2, (CW - 2.2) / 2, (CW - 2.2) / 2], 18);
+  table(s, M, 2.15, CW, rows, [2.4, (CW - 2.4) / 2, (CW - 2.4) / 2], 20, CONTENT_BOTTOM - 2.15);
   foot(s, 'OPA：調理吞噬活性，測血清能否促使白血球吞噬並殺死細菌，是成人試驗的首選終點');
   note(s, 'OPA 比單純測 IgG 更接近真實殺菌功能。');
 }
@@ -521,9 +533,9 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('與 PCV13 共有的 13 型', { bold: true }), td('PCV13（有 CAPiTA）'), td('IPD ＋ 肺炎', { bold: true, color: C.ok })],
     [td('額外的 7 型', { bold: true }), td('PPSV23'), td('僅 IPD，不含肺炎', { bold: true, color: C.bad })]
   ];
-  table(s, M, 2.3, CW, rows, [4.2, 3.6, CW - 7.8], 19);
-  callout(s, M, 4.5, CW, 1.5,
-    'PPSV23 對肺炎的效果證據本身就不一致\n橋接對象證明不了的事，橋接過來也證明不了', 'bad');
+  table(s, M, 2.15, CW, rows, [4.4, 3.8, CW - 8.2], 21, 2.2);
+  callout(s, M, 4.6, CW, 1.9,
+    'PPSV23 對肺炎的效果證據本身就不一致\n橋接對象證明不了的事，橋接過來也證明不了', 'bad', 23);
   foot(s, 'Hum Vaccin Immunother 2026｜查詢日 2026-08-07');
   note(s, '這是門診跟病人說「打這支預防肺炎」最容易過度延伸的地方。');
 }
@@ -609,7 +621,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('PCV20', { bold: true }), td('免疫橋接'), td('13 型橋接 PCV13；7 型橋接 PPSV23')],
     [td('PCV21', { bold: true }), td('免疫橋接'), td('頭對頭：11 個獨有型中 10 個優效')]
   ];
-  table(s, M, 2.2, CW, rows, [2.2, 3.3, CW - 5.5], 17);
+  table(s, M, 2.15, CW, rows, [2.4, 3.6, CW - 6.0], 19, CONTENT_BOTTOM - 2.15);
   foot(s, '詳見各頁出處｜查詢日 2026-08-07');
   note(s, '只有 PCV13 那列是綠的，這就是重點。');
 }
@@ -623,8 +635,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('非菌血性／非侵襲性 VT-CAP'), td('45.00%'), td('95.2% CI 14.21–65.31')],
     [td('疫苗血清型侵襲性疾病', { bold: true }), td('75.00%', { bold: true, color: C.deep }), td('95% CI 41.43–90.78')]
   ];
-  table(s, M, 2.2, CW, rows, [5.4, 2.6, CW - 8.0], 18);
-  callout(s, M, 4.6, CW, 1.0, '信賴區間是 95.2% 而非 95%（期中分析 alpha 消耗），引用時照抄', 'warn');
+  table(s, M, 2.15, CW, rows, [5.6, 2.8, CW - 8.4], 20, 2.5);
+  callout(s, M, 4.9, CW, 1.55, '信賴區間是 95.2% 而非 95%\n（期中分析 alpha 消耗），引用時照抄', 'warn', 23);
   foot(s, 'PMID 26076136｜查詢日 2026-08-07');
   note(s, '95.2% 這個細節，被問到時答得出來會很加分。');
 }
@@ -660,7 +672,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('獨有 11 型'), td('其中 10 型達優效（p<0.0001）', { bold: true, color: C.ok })],
     [td('安全性'), td('6 例死亡均判定與疫苗無關；無疫苗相關嚴重不良事件')]
   ];
-  table(s, M, 2.2, CW, rows, [3.0, CW - 3.0], 17);
+  table(s, M, 2.15, CW, rows, [3.4, CW - 3.4], 20, CONTENT_BOTTOM - 2.15);
   foot(s, 'Platt HL, et al. Lancet Infect Dis 2024;24(10):1141-1150（PMID 38964361）｜查詢日 2026-08-07');
   note(s, '');
 }
@@ -728,7 +740,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
      td('糖尿病、慢性心臟病、COPD、氣喘、慢性肝病、慢性腎病、酒精使用障礙、吸菸'),
      td('自費', { bold: true, color: C.bad }), td('公費', { bold: true, color: C.ok })]
   ];
-  table(s, M, 2.2, CW, rows, [2.4, 6.3, 1.6, CW - 10.3], 16);
+  table(s, M, 2.15, CW, rows, [2.7, 5.9, 1.7, CW - 10.3], 19, CONTENT_BOTTOM - 2.15);
   foot(s, '疾管署致醫界通函第 612 號｜查詢日 2026-08-07');
   note(s, '不能籠統說「高風險就公費」或「高風險只能自費」，兩種說法都會給錯答案。');
 }
@@ -744,7 +756,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
   card(s, 6.9, 2.3, CW - 6.2, 2.2, C.okBg);
   s.addText([
-    { text: '66 歲　同一個人', options: { breakLine: true, fontSize: 28, color: C.ink } },
+    { text: '65 歲　同一個人', options: { breakLine: true, fontSize: 28, color: C.ink } },
     { text: '公　費', options: { fontSize: 34, color: C.ok } }
   ], { x: 6.9, y: 2.3, w: CW - 6.2, h: 2.2, fontFace: F, bold: true, align: 'center', valign: 'middle', margin: 0 });
 
@@ -764,8 +776,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('PPV23'), td('不再提供公費', { bold: true }), td('仍為方案二的一部分')],
     [td('50–64 歲一般成人'), td('不符公費', { bold: true, color: C.bad }), td('建議接種', { bold: true, color: C.ok })]
   ];
-  table(s, M, 2.2, CW, rows, [3.2, 4.0, CW - 7.2], 17);
-  callout(s, M, 5.3, CW, 0.9, '門診最常見的落差：50–64 歲有糖尿病或 COPD 的病人', 'warn');
+  table(s, M, 2.15, CW, rows, [3.4, 4.2, CW - 7.6], 20, 3.05);
+  callout(s, M, 5.4, CW, 1.15, '門診最常見的落差：50–64 歲有糖尿病或 COPD 的病人', 'warn', 23);
   foot(s, 'ACIP：MMWR Recomm Rep 2023;72(3):1-39；2024 擴大至 ≥50 歲（PMID 39773952）');
   note(s, '');
 }
@@ -794,7 +806,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('僅打過 PCV13／15，且為高風險或 65 歲以上機構住民、洗腎患者'), td('≥ 8 週', { bold: true, color: C.bad })],
     [td('已完整接種 PCV13／15 ＋ PPV23'), td('原則上無需再打')]
   ];
-  table(s, M, 2.2, CW, rows, [8.0, CW - 8.0], 16);
+  table(s, M, 2.15, CW, rows, [7.6, CW - 7.6], 19, CONTENT_BOTTOM - 2.15);
   foot(s, '疾管署致醫界通函第 612 號｜查詢日 2026-08-07');
   note(s, '第四列最容易漏——高風險對象本身就適用 8 週，不必等一年。');
 }
@@ -823,6 +835,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     '肺炎鏈球菌疫苗全部都是不活化疫苗\n與任何疫苗都可同日於不同部位接種，不需要任何間隔', 'ok');
   callout(s, M, 4.35, CW, 1.5,
     '本節非疾管署公告內容\n通函第 612 號未規範合併施打，以下依國際指引與各疫苗研究整理', 'warn');
+  callout(s, M, 6.0, CW, 0.72,
+    '如疾管署日後發布相關規定，本頁內容依公告修訂', 'info', 19);
   foot(s, 'CDC Yellow Book 2026（出版日 2025-04-23）｜查詢日 2026-08-07');
   note(s, '一定要講「非官方公告」這句，避免聽眾以為有疾管署背書。');
 }
@@ -935,7 +949,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [td('ACIP 建議'), td('MMWR Recomm Rep 2023;72(3):1-39；PMID 39773952')],
     [td('合併施打'), td('CDC Yellow Book 2026（2025-04-23）')]
   ];
-  table(s, M, 2.1, CW, rows, [3.6, CW - 3.6], 15);
+  table(s, M, 2.1, CW, rows, [3.8, CW - 3.8], 17, CONTENT_BOTTOM - 2.1);
   foot(s, '全部查證日 2026-08-07｜本簡報未使用任何病人資料');
   note(s, '');
 }
