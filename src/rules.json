@@ -1,7 +1,11 @@
 {
   "meta": {
-    "version": "1.0.0",
-    "updated": "2026-08-07",
+    "version": "1.1.0",
+    "updated": "2026-08-08",
+    "changelog": [
+      "1.1.0（2026-08-08）依公告原文更正：對象二（三）的 5 年追加規則限『先前為 19–64 歲 IPD 高風險對象』；PCV15＋PPV23 同適用；新增 officialFlow 以公告原文結構呈現",
+      "1.0.0（2026-08-07）初版"
+    ],
     "policyEffectiveFrom": "2026-08-10",
     "description": "台灣成人肺炎鏈球菌疫苗接種決策規則表。決策器與補接種流程圖共用此檔，不得各自實作。",
     "sources": {
@@ -93,10 +97,65 @@
     "ppv23":       { "months": 12, "basis": "僅接種23價疫苗且間隔至少1年者" },
     "pcv13":       { "months": 12, "shortMonths": 2, "basis": "僅接種13或15價疫苗且間隔至少1年者（IPD高風險對象或65歲以上機構住民及洗腎患者間隔至少8週）" },
     "pcv15":       { "months": 12, "shortMonths": 2, "basis": "僅接種13或15價疫苗且間隔至少1年者（IPD高風險對象或65歲以上機構住民及洗腎患者間隔至少8週）" },
-    "pcv13_ppv23": { "months": 60, "requiresAge65": true, "basis": "曾完整接種13價＋23價各1劑者，滿65歲且與前劑間隔滿5年後可追加1劑" },
-    "pcv15_ppv23": { "complete": true, "basis": "視為已完成接種" },
+    "pcv13_ppv23": {
+      "complete": true,
+      "boosterRule": true,
+      "months": 60,
+      "requiresAge65": true,
+      "requiresPriorHighRisk": true,
+      "basis": "對象二（三）：先前為19-64歲IPD高風險對象，如曾經完整接種13價(或15價)及23價疫苗各1劑，可於滿65歲(含)且與前劑間隔滿(≧)5年後再接種1劑",
+      "completeBasis": "已完整接種13價(或15價)及23價各1劑，視為已完成接種"
+    },
+    "pcv15_ppv23": {
+      "complete": true,
+      "boosterRule": true,
+      "months": 60,
+      "requiresAge65": true,
+      "requiresPriorHighRisk": true,
+      "basis": "對象二（三）：先前為19-64歲IPD高風險對象，如曾經完整接種13價(或15價)及23價疫苗各1劑，可於滿65歲(含)且與前劑間隔滿(≧)5年後再接種1劑",
+      "completeBasis": "已完整接種13價(或15價)及23價各1劑，視為已完成接種"
+    },
     "pcv20":       { "complete": true, "basis": "視為已完成接種" },
     "pcv21":       { "complete": true, "basis": "視為已完成接種" }
+  },
+
+  "officialFlow": {
+    "note": "依疾管署公告原文結構，分為「對象一」與「對象二」兩大類，供投影片與流程圖共用。",
+    "contracted": "約 2,800 家合約醫療院所",
+    "groups": [
+      {
+        "id": "one",
+        "label": "對象一　從未接種",
+        "detail": "從未接種肺鏈疫苗（包含 13、15、20、21 或 23 價疫苗）者",
+        "action": "無間隔需求，即可接種 1 劑",
+        "tone": "ok"
+      },
+      {
+        "id": "two",
+        "label": "對象二　曾經接種",
+        "detail": "曾經接種肺鏈疫苗者，依下列三種情形銜接接種",
+        "tone": "info",
+        "subs": [
+          {
+            "id": "two-1",
+            "label": "（一）僅接種過 23 價",
+            "action": "間隔至少 1 年"
+          },
+          {
+            "id": "two-2",
+            "label": "（二）僅接種過 13 或 15 價",
+            "action": "間隔至少 1 年",
+            "exception": "IPD 高風險對象，或 65 歲以上「機構住民」及「洗腎患者」：間隔至少 8 週"
+          },
+          {
+            "id": "two-3",
+            "label": "（三）曾完整接種 13 價（或 15 價）＋ 23 價各 1 劑",
+            "action": "限先前為 19–64 歲 IPD 高風險對象，滿 65 歲（含）且與前劑間隔滿 5 年後再接種 1 劑",
+            "exception": "非上述身分者視為已完成接種，不再追加"
+          }
+        ]
+      }
+    ]
   },
 
   "shortIntervalEligibility": {
@@ -123,8 +182,11 @@
       "text": "本族群不符現行公費資格，如欲接種需自費。文獻顯示具 2 個以上共病症者，其肺炎風險與高風險患者相當或甚至更高，建議主動評估。",
       "source": "Pelton SI, et al. BMC Infect Dis 2015;15:470"
     },
-    "boosterAmbiguity": {
-      "text": "已完整接種 PCV13＋PPV23 者的追加規定，通函第 612 號敘述限於「19–64 歲 IPD 高風險對象」，新聞稿附表則未特別限定身分。實際資格請以合約院所認定為準。"
+    "boosterEligible": {
+      "text": "本情形屬公告「對象二（三）」：先前為 19–64 歲 IPD 高風險對象，曾完整接種 13 價（或 15 價）及 23 價各 1 劑者，於滿 65 歲且與前劑間隔 ≥5 年後可再接種 1 劑。"
+    },
+    "boosterNotApplicable": {
+      "text": "已完整接種 13 價（或 15 價）及 23 價各 1 劑者視為已完成接種。「滿 65 歲後間隔 5 年可再接種 1 劑」僅適用於**先前為 19–64 歲 IPD 高風險對象**者，一般公費對象不適用。"
     },
     "coadmin": {
       "text": "肺炎鏈球菌疫苗為不活化疫苗，與流感、COVID-19、RSV、Tdap、A 肝、B 肝、Shingrix 及 MMR、水痘等疫苗均可同日於不同部位接種，無間隔限制。合併施打規定非疾管署公告內容，係依國際指引與仿單整理。"

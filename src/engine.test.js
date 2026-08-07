@@ -39,13 +39,14 @@ for (let age = 18; age <= 95; age++) {
         for (const history of histories) {
           for (const monthsSinceLast of monthsOptions) {
             for (const isInstitutional of [false, true]) {
-              for (const isDialysis of [false, true]) {
+              for (const priorHighRisk19to64 of [false, true]) {
+                const isDialysis = priorHighRisk19to64;   // 兩個布林維度交錯覆蓋，避免組合數爆炸
                 combos++;
                 let r;
                 try {
                   r = decide({
                     birthYear, currentYear: YEAR, isIndigenous, fundedRisk, clinicalRisk,
-                    history, monthsSinceLast, isInstitutional, isDialysis
+                    history, monthsSinceLast, isInstitutional, isDialysis, priorHighRisk19to64
                   });
                 } catch (e) {
                   failures++;
@@ -102,8 +103,23 @@ const scenarios = [
     expect: { funded: true, action: 'vaccinate', payment: '公費', category: 'highrisk19', hasWarning: 'menacwyD' }
   },
   {
-    name: '⑤ 67 歲、舊制打過 PCV13＋PPV23、距前劑 7 年',
+    name: '⑤ 67 歲、舊制 PCV13＋PPV23、距前劑 7 年、非高風險出身（視為已完成）',
     input: { birthYear: 1959, history: 'pcv13_ppv23', monthsSinceLast: 84 },
+    expect: { funded: true, action: 'complete', payment: '—', hasWarning: 'boosterNotApplicable' }
+  },
+  {
+    name: '⑤b 同上，但先前為 19–64 歲 IPD 高風險對象（對象二（三）可追加）',
+    input: { birthYear: 1959, history: 'pcv13_ppv23', monthsSinceLast: 84, priorHighRisk19to64: true },
+    expect: { funded: true, action: 'vaccinate', payment: '公費', hasWarning: 'boosterEligible' }
+  },
+  {
+    name: '⑤c 同上但距前劑僅 3 年（未滿 5 年）',
+    input: { birthYear: 1959, history: 'pcv13_ppv23', monthsSinceLast: 36, priorHighRisk19to64: true },
+    expect: { funded: true, action: 'wait_interval', monthsRemaining: 24 }
+  },
+  {
+    name: '⑤d PCV15＋PPV23 亦適用同一條（公告寫「13價(或15價)」）',
+    input: { birthYear: 1959, history: 'pcv15_ppv23', monthsSinceLast: 84, priorHighRisk19to64: true },
     expect: { funded: true, action: 'vaccinate', payment: '公費' }
   },
   {
@@ -127,8 +143,8 @@ const scenarios = [
     expect: { funded: true, action: 'complete', payment: '—' }
   },
   {
-    name: '⑩ 55 歲、舊制打過 PCV13＋PPV23（未滿 65 歲，尚不可追加）',
-    input: { birthYear: 1971, history: 'pcv13_ppv23', monthsSinceLast: 84, fundedRisk: ['csfLeak'] },
+    name: '⑩ 55 歲 IPD 高風險、舊制兩劑（未滿 65 歲，尚不可追加）',
+    input: { birthYear: 1971, history: 'pcv13_ppv23', monthsSinceLast: 84, fundedRisk: ['csfLeak'], priorHighRisk19to64: true },
     expect: { funded: true, action: 'wait_age' }
   }
 ];

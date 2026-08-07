@@ -53,18 +53,31 @@
   function resolveInterval(ctx) {
     const rule = RULES.intervalRules[ctx.history];
     const { age, monthsSinceLast } = ctx;
+    const elapsedAll = monthsSinceLast == null ? 0 : monthsSinceLast;
+
+    /**
+     * 對象二（三）：曾完整接種 13 價（或 15 價）＋ 23 價各 1 劑
+     * 公告原文限定「先前為 19–64 歲 IPD 高風險對象」才可於滿 65 歲、
+     * 間隔 ≥5 年後再接種 1 劑；其餘身分一律視為已完成接種。
+     */
+    if (rule.boosterRule) {
+      if (!ctx.priorHighRisk19to64) {
+        return { status: 'complete', requiredMonths: null, basis: rule.completeBasis, boosterNA: true };
+      }
+      if (age < 65) {
+        return { status: 'notYetAge65', requiredMonths: rule.months, basis: rule.basis };
+      }
+      if (elapsedAll >= rule.months) {
+        return { status: 'ready', requiredMonths: rule.months, basis: rule.basis, booster: true };
+      }
+      return {
+        status: 'wait', requiredMonths: rule.months,
+        monthsRemaining: rule.months - elapsedAll, basis: rule.basis, booster: true
+      };
+    }
 
     if (rule.complete) {
       return { status: 'complete', requiredMonths: null, basis: rule.basis };
-    }
-
-    // PCV13＋PPV23 舊制完整兩劑：需滿 65 歲且距前劑 ≥5 年才可追加
-    if (rule.requiresAge65 && age < 65) {
-      return {
-        status: 'notYetAge65',
-        requiredMonths: rule.months,
-        basis: rule.basis
-      };
     }
 
     let required = rule.months;
@@ -107,8 +120,11 @@
     if (!fundedCategory && ctx.clinicalRisk.length > 0) {
       out.push({ id: 'selfPay', level: 'info', text: W.selfPay.text, source: W.selfPay.source });
     }
-    if (ctx.history === 'pcv13_ppv23' && interval.status !== 'complete') {
-      out.push({ id: 'boosterAmbiguity', level: 'info', text: W.boosterAmbiguity.text });
+    if (interval.booster) {
+      out.push({ id: 'boosterEligible', level: 'info', text: W.boosterEligible.text });
+    }
+    if (interval.boosterNA) {
+      out.push({ id: 'boosterNotApplicable', level: 'info', text: W.boosterNotApplicable.text });
     }
     out.push({ id: 'coadmin', level: 'info', text: W.coadmin.text });
     return out;
@@ -168,7 +184,8 @@
       history: input.history || 'none',
       monthsSinceLast: input.monthsSinceLast == null ? null : input.monthsSinceLast,
       isInstitutional: !!input.isInstitutional,
-      isDialysis: !!input.isDialysis
+      isDialysis: !!input.isDialysis,
+      priorHighRisk19to64: !!input.priorHighRisk19to64
     };
 
     const fundedCategory = resolveFundedCategory(ctx);
@@ -188,7 +205,7 @@
     } else if (interval.status === 'notYetAge65') {
       action = 'wait_age';
       headline = '目前無需再打，滿 65 歲後可評估追加';
-      detail = '已完整接種 PCV13＋PPV23。依規定須滿 65 歲且與前劑間隔滿 5 年後，方可追加 1 劑 PCV20 或 PCV21。';
+      detail = '已完整接種 13 價（或 15 價）＋ 23 價各 1 劑。因先前為 19–64 歲 IPD 高風險對象，須滿 65 歲（含）且與前劑間隔滿 5 年後，方可再接種 1 劑 PCV20 或 PCV21。';
       vaccine = null;
       payment = fundedCategory ? '公費（追加時）' : '自費';
     } else if (interval.status === 'wait') {

@@ -795,37 +795,100 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   note(s, '');
 }
 
+/* 銜接規則依公告原文結構拆成 4 頁：對象一 → 對象二（一）（二）→ 但書 → （三）*/
 {
   const s = slide();
-  head(s, '銜接接種規則', '門診實務');
-  const rows = [
-    [th('過去接種史'), th('間隔要求')],
-    [td('從未接種（含 13／15／20／21／23 價）'), td('無間隔需求', { bold: true, color: C.ok })],
-    [td('僅打過 PPV23'), td('≥ 1 年')],
-    [td('僅打過 PCV13／15（一般公費對象）'), td('≥ 1 年')],
-    [td('僅打過 PCV13／15，且為高風險或 65 歲以上機構住民、洗腎患者'), td('≥ 8 週', { bold: true, color: C.bad })],
-    [td('已完整接種 PCV13／15 ＋ PPV23'), td('原則上無需再打')]
-  ];
-  table(s, M, 2.15, CW, rows, [7.6, CW - 7.6], 19, CONTENT_BOTTOM - 2.15);
-  foot(s, '疾管署致醫界通函第 612 號｜查詢日 2026-08-07');
-  note(s, '第四列最容易漏——高風險對象本身就適用 8 週，不必等一年。');
+  head(s, '公告把接種資格分成兩大類', '門診實務｜銜接規則');
+  const cw2 = 5.75;
+
+  card(s, M, 2.15, cw2, 4.4, C.okBg);
+  s.addText('對象一', { x: M + 0.35, y: 2.4, w: cw2 - 0.7, h: 0.5, fontFace: F, fontSize: 26, bold: true, color: C.ok });
+  s.addText('從未接種', { x: M + 0.35, y: 2.95, w: cw2 - 0.7, h: 0.55, fontFace: F, fontSize: 30, bold: true, color: C.ink });
+  s.addText('包含 13、15、20、21 或 23 價疫苗', {
+    x: M + 0.35, y: 3.6, w: cw2 - 0.7, h: 0.5, fontFace: F, fontSize: 17, color: C.ink2 });
+  s.addText('無間隔需求\n即可接種 1 劑', {
+    x: M + 0.35, y: 4.4, w: cw2 - 0.7, h: 1.7, fontFace: F, fontSize: 28, bold: true,
+    color: C.ok, valign: 'middle' });
+
+  card(s, M + cw2 + 0.4, 2.15, cw2, 4.4);
+  const x2 = M + cw2 + 0.75;
+  s.addText('對象二', { x: x2, y: 2.4, w: cw2 - 0.7, h: 0.5, fontFace: F, fontSize: 26, bold: true, color: C.deep });
+  s.addText('曾經接種', { x: x2, y: 2.95, w: cw2 - 0.7, h: 0.55, fontFace: F, fontSize: 30, bold: true, color: C.ink });
+  s.addText('依下列三種情形銜接接種', {
+    x: x2, y: 3.6, w: cw2 - 0.7, h: 0.5, fontFace: F, fontSize: 17, color: C.ink2 });
+  s.addText([
+    { text: '（一）僅接種過 23 價', options: { breakLine: true } },
+    { text: '（二）僅接種過 13 或 15 價', options: { breakLine: true } },
+    { text: '（三）曾完整接種兩劑', options: {} }
+  ], { x: x2, y: 4.35, w: cw2 - 0.7, h: 1.8, fontFace: F, fontSize: 21, bold: true,
+       color: C.deep, paraSpaceAfter: 8, valign: 'top' });
+
+  foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜合約醫療院所約 2,800 家｜查詢日 2026-08-08');
+  note(s, '先把公告的兩層結構講清楚，後面三頁才逐項展開對象二。');
 }
 
 {
   const s = slide();
-  head(s, '誰適用 8 週短間隔', '門診實務');
+  head(s, '對象二（一）（二）：只打過一種疫苗', '門診實務｜銜接規則');
+  const rows = [
+    [th('情形'), th('過去接種史'), th('間隔要求')],
+    [td('（一）', { bold: true, color: C.deep }), td('僅接種過 23 價疫苗'), td('≥ 1 年', { bold: true })],
+    [td('（二）', { bold: true, color: C.deep }), td('僅接種過 13 或 15 價疫苗'), td('≥ 1 年', { bold: true })],
+    [td('（二）\n但書', { bold: true, color: C.bad }),
+     td('上列且為 IPD 高風險對象，或 65 歲以上機構住民、洗腎患者'),
+     td('≥ 8 週', { bold: true, color: C.bad })]
+  ];
+  table(s, M, 2.15, CW, rows, [1.9, 7.0, CW - 8.9], 20, CONTENT_BOTTOM - 2.15);
+  foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜查詢日 2026-08-08');
+  note(s, '最後一列的但書最常被漏掉——高風險對象本身就適用 8 週，不必等一年。');
+}
+
+{
+  const s = slide();
+  head(s, '（二）的但書：誰適用 8 週', '門診實務｜銜接規則');
   const items = ['19–64 歲 IPD 高風險對象', '65 歲以上機構住民', '65 歲以上洗腎患者'];
   items.forEach((t, i) => {
-    const y = 2.35 + i * 1.15;
-    numCircle(s, M, y, 0.65, String(i + 1), C.bad);
+    const y = 2.3 + i * 1.25;
+    card(s, M, y, CW, 1.05, C.badBg);
+    numCircle(s, M + 0.3, y + 0.2, 0.65, String(i + 1), C.bad);
     s.addText(t, {
-      x: M + 0.9, y: y, w: CW - 1.0, h: 0.65, fontFace: F, fontSize: 24, bold: true,
+      x: M + 1.15, y: y, w: CW - 1.5, h: 1.05, fontFace: F, fontSize: 26, bold: true,
       color: C.ink, valign: 'middle', margin: 0
     });
   });
-  callout(s, M, 6.0, CW, 0.85, '限曾接種 PCV13 或 PCV15 者；其餘情形仍為 1 年', 'info');
-  foot(s, '疾管署致醫界通函第 612 號｜查詢日 2026-08-07');
-  note(s, '');
+  callout(s, M, 6.1, CW, 0.75, '限曾接種 13 或 15 價者；其餘情形仍為 1 年', 'info', 19);
+  foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜查詢日 2026-08-08');
+  note(s, '這三種身分只要打過 13 或 15 價，八週後就可以接種新疫苗。');
+}
+
+{
+  const s = slide();
+  head(s, '對象二（三）：已完整接種兩劑者', '門診實務｜銜接規則');
+  s.addText('曾完整接種 13 價（或 15 價）＋ 23 價各 1 劑', {
+    x: M, y: 2.0, w: CW, h: 0.5, fontFace: F, fontSize: 21, bold: true, color: C.ink2 });
+  const cw2 = 5.75;
+
+  card(s, M, 2.6, cw2, 3.3, C.okBg);
+  s.addText('先前為 19–64 歲\nIPD 高風險對象', {
+    x: M + 0.35, y: 2.8, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 21, bold: true, color: C.ok });
+  s.addText('滿 65 歲（含）\n且距前劑 ≥ 5 年', {
+    x: M + 0.35, y: 3.85, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 24, bold: true, color: C.ink });
+  s.addText('可再接種 1 劑', {
+    x: M + 0.35, y: 4.95, w: cw2 - 0.7, h: 0.65, fontFace: F, fontSize: 26, bold: true, color: C.ok });
+
+  card(s, M + cw2 + 0.4, 2.6, cw2, 3.3);
+  const x2 = M + cw2 + 0.75;
+  s.addText('非上述身分者', {
+    x: x2, y: 2.8, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 21, bold: true, color: C.ink2 });
+  s.addText('視為\n已完成接種', {
+    x: x2, y: 3.85, w: cw2 - 0.7, h: 1.0, fontFace: F, fontSize: 26, bold: true, color: C.ink });
+  s.addText('不再追加', {
+    x: x2, y: 4.95, w: cw2 - 0.7, h: 0.65, fontFace: F, fontSize: 26, bold: true, color: C.ink2 });
+
+  callout(s, M, 6.05, CW, 0.8,
+    '關鍵限定：5 年追加只給「先前為 19–64 歲 IPD 高風險對象」，不是所有 65 歲以上', 'bad', 19);
+  foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜查詢日 2026-08-08');
+  note(s, '這一條最容易讀成「任何 65 歲以上打過兩劑都可以再打」，公告原文有身分限定。');
 }
 
 {

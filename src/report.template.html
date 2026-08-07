@@ -430,6 +430,8 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
       <label class="chk"><input type="checkbox" id="indig"> 原住民</label>
       <label class="chk"><input type="checkbox" id="inst"> 機構住民</label>
       <label class="chk"><input type="checkbox" id="dial"> 洗腎患者</label>
+      <label class="chk"><input type="checkbox" id="prior"> <span><b>先前為 19–64 歲 IPD 高風險對象</b><br>
+        <span style="font-size:12px;color:#4a5b6d">僅影響「已完整接種兩劑」者能否於滿 65 歲後追加</span></span></label>
     </div>
     <div>
       <label>公費高風險適應症（第一層）</label>
@@ -614,6 +616,7 @@ var PNEUMO_RULES = /*__RULES_JSON__*/;
     var r = E.decide({
       birthYear: by, currentYear: YEAR,
       isIndigenous: $('indig').checked, isInstitutional: $('inst').checked, isDialysis: $('dial').checked,
+      priorHighRisk19to64: $('prior').checked,
       fundedRisk: picked('funded'), clinicalRisk: picked('clinical'),
       history: histSel.value,
       monthsSinceLast: parseInt($('msl').value, 10) || 0
@@ -653,7 +656,7 @@ var PNEUMO_RULES = /*__RULES_JSON__*/;
     h += '</div>';
     $('out').innerHTML = h;
   }
-  ['by','hist','msl','indig','inst','dial'].forEach(function(id){
+  ['by','hist','msl','indig','inst','dial','prior'].forEach(function(id){
     $(id).addEventListener('input', render); $(id).addEventListener('change', render);
   });
   document.addEventListener('change', function(e){
@@ -666,22 +669,26 @@ var PNEUMO_RULES = /*__RULES_JSON__*/;
   fh += '<div class="fnode"><div class="q">步驟 1　是否符合公費資格？</div><div class="a">';
   R.fundedCategories.forEach(function(c){ fh += '・' + c.label + '<br>'; });
   fh += '以上皆非 → <b>自費</b>（65 歲以後自動轉為公費）</div></div>';
-  fh += '<div class="fnode"><div class="q">步驟 2　過去打過什麼？需要間隔多久？</div><div class="a">';
-  R.historyOptions.forEach(function(o){
-    var r = R.intervalRules[o.id];
-    var txt;
-    if (r.complete) txt = '<b>視為已完成接種，無需再打</b>';
-    else if (r.requiresAge65) txt = '<b>滿 65 歲</b>且距前劑 <b>≥5 年</b>可追加 1 劑';
-    else if (r.months === 0) txt = '<b>無間隔需求，現在即可接種</b>';
-    else txt = '間隔 <b>≥' + r.months + ' 個月</b>' + (r.shortMonths ? '（符合短間隔條件者 <b>≥8 週</b>）' : '');
-    fh += '・' + o.label + ' → ' + txt + '<br>';
+
+  // 步驟 2 依疾管署公告原文結構呈現：對象一／對象二（一）（二）（三）
+  R.officialFlow.groups.forEach(function(g){
+    fh += '<div class="fnode"><div class="q">步驟 2　' + g.label + '</div><div class="a">';
+    fh += g.detail + '<br>';
+    if (g.action) fh += '→ <b>' + g.action + '</b>';
+    if (g.subs) {
+      g.subs.forEach(function(sub){
+        fh += '<div style="margin-top:10px;padding-left:12px;border-left:3px solid #dfe6ee">';
+        fh += '<b>' + sub.label + '</b><br>→ <b>' + sub.action + '</b>';
+        if (sub.exception) fh += '<br><span style="color:#b45309">但書：' + sub.exception + '</span>';
+        fh += '</div>';
+      });
+    }
+    fh += '</div></div>';
   });
-  fh += '</div></div>';
-  fh += '<div class="fnode"><div class="q">步驟 3　誰適用 8 週短間隔？</div><div class="a">';
-  R.shortIntervalEligibility.conditions.forEach(function(c){ fh += '・' + c + '<br>'; });
-  fh += '（限曾接種 PCV13 或 PCV15 者）</div></div>';
-  fh += '<div class="fnode"><div class="q">步驟 4　打哪一支？</div><div class="a"><b>'
-      + R.vaccines.offered.join(' 或 ') + '</b>，' + R.vaccines.choiceNote + '</div></div>';
+
+  fh += '<div class="fnode"><div class="q">步驟 3　打哪一支？</div><div class="a"><b>'
+      + R.vaccines.offered.join(' 或 ') + '</b>，' + R.vaccines.choiceNote
+      + '<br>可前往 ' + R.officialFlow.contracted + '接種。</div></div>';
   flow.innerHTML = fh;
 })();
 </script>

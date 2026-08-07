@@ -430,6 +430,8 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
       <label class="chk"><input type="checkbox" id="indig"> 原住民</label>
       <label class="chk"><input type="checkbox" id="inst"> 機構住民</label>
       <label class="chk"><input type="checkbox" id="dial"> 洗腎患者</label>
+      <label class="chk"><input type="checkbox" id="prior"> <span><b>先前為 19–64 歲 IPD 高風險對象</b><br>
+        <span style="font-size:12px;color:#4a5b6d">僅影響「已完整接種兩劑」者能否於滿 65 歲後追加</span></span></label>
     </div>
     <div>
       <label>公費高風險適應症（第一層）</label>
@@ -528,8 +530,12 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
 /* ═══ 內嵌規則表（由 build.js 從 src/rules.json 注入，勿手動編輯）═══ */
 var PNEUMO_RULES = {
   "meta": {
-    "version": "1.0.0",
-    "updated": "2026-08-07",
+    "version": "1.1.0",
+    "updated": "2026-08-08",
+    "changelog": [
+      "1.1.0（2026-08-08）依公告原文更正：對象二（三）的 5 年追加規則限『先前為 19–64 歲 IPD 高風險對象』；PCV15＋PPV23 同適用；新增 officialFlow 以公告原文結構呈現",
+      "1.0.0（2026-08-07）初版"
+    ],
     "policyEffectiveFrom": "2026-08-10",
     "description": "台灣成人肺炎鏈球菌疫苗接種決策規則表。決策器與補接種流程圖共用此檔，不得各自實作。",
     "sources": {
@@ -698,13 +704,22 @@ var PNEUMO_RULES = {
       "basis": "僅接種13或15價疫苗且間隔至少1年者（IPD高風險對象或65歲以上機構住民及洗腎患者間隔至少8週）"
     },
     "pcv13_ppv23": {
+      "complete": true,
+      "boosterRule": true,
       "months": 60,
       "requiresAge65": true,
-      "basis": "曾完整接種13價＋23價各1劑者，滿65歲且與前劑間隔滿5年後可追加1劑"
+      "requiresPriorHighRisk": true,
+      "basis": "對象二（三）：先前為19-64歲IPD高風險對象，如曾經完整接種13價(或15價)及23價疫苗各1劑，可於滿65歲(含)且與前劑間隔滿(≧)5年後再接種1劑",
+      "completeBasis": "已完整接種13價(或15價)及23價各1劑，視為已完成接種"
     },
     "pcv15_ppv23": {
       "complete": true,
-      "basis": "視為已完成接種"
+      "boosterRule": true,
+      "months": 60,
+      "requiresAge65": true,
+      "requiresPriorHighRisk": true,
+      "basis": "對象二（三）：先前為19-64歲IPD高風險對象，如曾經完整接種13價(或15價)及23價疫苗各1劑，可於滿65歲(含)且與前劑間隔滿(≧)5年後再接種1劑",
+      "completeBasis": "已完整接種13價(或15價)及23價各1劑，視為已完成接種"
     },
     "pcv20": {
       "complete": true,
@@ -714,6 +729,44 @@ var PNEUMO_RULES = {
       "complete": true,
       "basis": "視為已完成接種"
     }
+  },
+  "officialFlow": {
+    "note": "依疾管署公告原文結構，分為「對象一」與「對象二」兩大類，供投影片與流程圖共用。",
+    "contracted": "約 2,800 家合約醫療院所",
+    "groups": [
+      {
+        "id": "one",
+        "label": "對象一　從未接種",
+        "detail": "從未接種肺鏈疫苗（包含 13、15、20、21 或 23 價疫苗）者",
+        "action": "無間隔需求，即可接種 1 劑",
+        "tone": "ok"
+      },
+      {
+        "id": "two",
+        "label": "對象二　曾經接種",
+        "detail": "曾經接種肺鏈疫苗者，依下列三種情形銜接接種",
+        "tone": "info",
+        "subs": [
+          {
+            "id": "two-1",
+            "label": "（一）僅接種過 23 價",
+            "action": "間隔至少 1 年"
+          },
+          {
+            "id": "two-2",
+            "label": "（二）僅接種過 13 或 15 價",
+            "action": "間隔至少 1 年",
+            "exception": "IPD 高風險對象，或 65 歲以上「機構住民」及「洗腎患者」：間隔至少 8 週"
+          },
+          {
+            "id": "two-3",
+            "label": "（三）曾完整接種 13 價（或 15 價）＋ 23 價各 1 劑",
+            "action": "限先前為 19–64 歲 IPD 高風險對象，滿 65 歲（含）且與前劑間隔滿 5 年後再接種 1 劑",
+            "exception": "非上述身分者視為已完成接種，不再追加"
+          }
+        ]
+      }
+    ]
   },
   "shortIntervalEligibility": {
     "months": 2,
@@ -741,8 +794,11 @@ var PNEUMO_RULES = {
       "text": "本族群不符現行公費資格，如欲接種需自費。文獻顯示具 2 個以上共病症者，其肺炎風險與高風險患者相當或甚至更高，建議主動評估。",
       "source": "Pelton SI, et al. BMC Infect Dis 2015;15:470"
     },
-    "boosterAmbiguity": {
-      "text": "已完整接種 PCV13＋PPV23 者的追加規定，通函第 612 號敘述限於「19–64 歲 IPD 高風險對象」，新聞稿附表則未特別限定身分。實際資格請以合約院所認定為準。"
+    "boosterEligible": {
+      "text": "本情形屬公告「對象二（三）」：先前為 19–64 歲 IPD 高風險對象，曾完整接種 13 價（或 15 價）及 23 價各 1 劑者，於滿 65 歲且與前劑間隔 ≥5 年後可再接種 1 劑。"
+    },
+    "boosterNotApplicable": {
+      "text": "已完整接種 13 價（或 15 價）及 23 價各 1 劑者視為已完成接種。「滿 65 歲後間隔 5 年可再接種 1 劑」僅適用於**先前為 19–64 歲 IPD 高風險對象**者，一般公費對象不適用。"
     },
     "coadmin": {
       "text": "肺炎鏈球菌疫苗為不活化疫苗，與流感、COVID-19、RSV、Tdap、A 肝、B 肝、Shingrix 及 MMR、水痘等疫苗均可同日於不同部位接種，無間隔限制。合併施打規定非疾管署公告內容，係依國際指引與仿單整理。"
@@ -870,18 +926,31 @@ var PNEUMO_RULES = {
   function resolveInterval(ctx) {
     const rule = RULES.intervalRules[ctx.history];
     const { age, monthsSinceLast } = ctx;
+    const elapsedAll = monthsSinceLast == null ? 0 : monthsSinceLast;
+
+    /**
+     * 對象二（三）：曾完整接種 13 價（或 15 價）＋ 23 價各 1 劑
+     * 公告原文限定「先前為 19–64 歲 IPD 高風險對象」才可於滿 65 歲、
+     * 間隔 ≥5 年後再接種 1 劑；其餘身分一律視為已完成接種。
+     */
+    if (rule.boosterRule) {
+      if (!ctx.priorHighRisk19to64) {
+        return { status: 'complete', requiredMonths: null, basis: rule.completeBasis, boosterNA: true };
+      }
+      if (age < 65) {
+        return { status: 'notYetAge65', requiredMonths: rule.months, basis: rule.basis };
+      }
+      if (elapsedAll >= rule.months) {
+        return { status: 'ready', requiredMonths: rule.months, basis: rule.basis, booster: true };
+      }
+      return {
+        status: 'wait', requiredMonths: rule.months,
+        monthsRemaining: rule.months - elapsedAll, basis: rule.basis, booster: true
+      };
+    }
 
     if (rule.complete) {
       return { status: 'complete', requiredMonths: null, basis: rule.basis };
-    }
-
-    // PCV13＋PPV23 舊制完整兩劑：需滿 65 歲且距前劑 ≥5 年才可追加
-    if (rule.requiresAge65 && age < 65) {
-      return {
-        status: 'notYetAge65',
-        requiredMonths: rule.months,
-        basis: rule.basis
-      };
     }
 
     let required = rule.months;
@@ -924,8 +993,11 @@ var PNEUMO_RULES = {
     if (!fundedCategory && ctx.clinicalRisk.length > 0) {
       out.push({ id: 'selfPay', level: 'info', text: W.selfPay.text, source: W.selfPay.source });
     }
-    if (ctx.history === 'pcv13_ppv23' && interval.status !== 'complete') {
-      out.push({ id: 'boosterAmbiguity', level: 'info', text: W.boosterAmbiguity.text });
+    if (interval.booster) {
+      out.push({ id: 'boosterEligible', level: 'info', text: W.boosterEligible.text });
+    }
+    if (interval.boosterNA) {
+      out.push({ id: 'boosterNotApplicable', level: 'info', text: W.boosterNotApplicable.text });
     }
     out.push({ id: 'coadmin', level: 'info', text: W.coadmin.text });
     return out;
@@ -985,7 +1057,8 @@ var PNEUMO_RULES = {
       history: input.history || 'none',
       monthsSinceLast: input.monthsSinceLast == null ? null : input.monthsSinceLast,
       isInstitutional: !!input.isInstitutional,
-      isDialysis: !!input.isDialysis
+      isDialysis: !!input.isDialysis,
+      priorHighRisk19to64: !!input.priorHighRisk19to64
     };
 
     const fundedCategory = resolveFundedCategory(ctx);
@@ -1005,7 +1078,7 @@ var PNEUMO_RULES = {
     } else if (interval.status === 'notYetAge65') {
       action = 'wait_age';
       headline = '目前無需再打，滿 65 歲後可評估追加';
-      detail = '已完整接種 PCV13＋PPV23。依規定須滿 65 歲且與前劑間隔滿 5 年後，方可追加 1 劑 PCV20 或 PCV21。';
+      detail = '已完整接種 13 價（或 15 價）＋ 23 價各 1 劑。因先前為 19–64 歲 IPD 高風險對象，須滿 65 歲（含）且與前劑間隔滿 5 年後，方可再接種 1 劑 PCV20 或 PCV21。';
       vaccine = null;
       payment = fundedCategory ? '公費（追加時）' : '自費';
     } else if (interval.status === 'wait') {
@@ -1142,6 +1215,7 @@ var PNEUMO_RULES = {
     var r = E.decide({
       birthYear: by, currentYear: YEAR,
       isIndigenous: $('indig').checked, isInstitutional: $('inst').checked, isDialysis: $('dial').checked,
+      priorHighRisk19to64: $('prior').checked,
       fundedRisk: picked('funded'), clinicalRisk: picked('clinical'),
       history: histSel.value,
       monthsSinceLast: parseInt($('msl').value, 10) || 0
@@ -1181,7 +1255,7 @@ var PNEUMO_RULES = {
     h += '</div>';
     $('out').innerHTML = h;
   }
-  ['by','hist','msl','indig','inst','dial'].forEach(function(id){
+  ['by','hist','msl','indig','inst','dial','prior'].forEach(function(id){
     $(id).addEventListener('input', render); $(id).addEventListener('change', render);
   });
   document.addEventListener('change', function(e){
@@ -1194,22 +1268,26 @@ var PNEUMO_RULES = {
   fh += '<div class="fnode"><div class="q">步驟 1　是否符合公費資格？</div><div class="a">';
   R.fundedCategories.forEach(function(c){ fh += '・' + c.label + '<br>'; });
   fh += '以上皆非 → <b>自費</b>（65 歲以後自動轉為公費）</div></div>';
-  fh += '<div class="fnode"><div class="q">步驟 2　過去打過什麼？需要間隔多久？</div><div class="a">';
-  R.historyOptions.forEach(function(o){
-    var r = R.intervalRules[o.id];
-    var txt;
-    if (r.complete) txt = '<b>視為已完成接種，無需再打</b>';
-    else if (r.requiresAge65) txt = '<b>滿 65 歲</b>且距前劑 <b>≥5 年</b>可追加 1 劑';
-    else if (r.months === 0) txt = '<b>無間隔需求，現在即可接種</b>';
-    else txt = '間隔 <b>≥' + r.months + ' 個月</b>' + (r.shortMonths ? '（符合短間隔條件者 <b>≥8 週</b>）' : '');
-    fh += '・' + o.label + ' → ' + txt + '<br>';
+
+  // 步驟 2 依疾管署公告原文結構呈現：對象一／對象二（一）（二）（三）
+  R.officialFlow.groups.forEach(function(g){
+    fh += '<div class="fnode"><div class="q">步驟 2　' + g.label + '</div><div class="a">';
+    fh += g.detail + '<br>';
+    if (g.action) fh += '→ <b>' + g.action + '</b>';
+    if (g.subs) {
+      g.subs.forEach(function(sub){
+        fh += '<div style="margin-top:10px;padding-left:12px;border-left:3px solid #dfe6ee">';
+        fh += '<b>' + sub.label + '</b><br>→ <b>' + sub.action + '</b>';
+        if (sub.exception) fh += '<br><span style="color:#b45309">但書：' + sub.exception + '</span>';
+        fh += '</div>';
+      });
+    }
+    fh += '</div></div>';
   });
-  fh += '</div></div>';
-  fh += '<div class="fnode"><div class="q">步驟 3　誰適用 8 週短間隔？</div><div class="a">';
-  R.shortIntervalEligibility.conditions.forEach(function(c){ fh += '・' + c + '<br>'; });
-  fh += '（限曾接種 PCV13 或 PCV15 者）</div></div>';
-  fh += '<div class="fnode"><div class="q">步驟 4　打哪一支？</div><div class="a"><b>'
-      + R.vaccines.offered.join(' 或 ') + '</b>，' + R.vaccines.choiceNote + '</div></div>';
+
+  fh += '<div class="fnode"><div class="q">步驟 3　打哪一支？</div><div class="a"><b>'
+      + R.vaccines.offered.join(' 或 ') + '</b>，' + R.vaccines.choiceNote
+      + '<br>可前往 ' + R.officialFlow.contracted + '接種。</div></div>';
   flow.innerHTML = fh;
 })();
 </script>
