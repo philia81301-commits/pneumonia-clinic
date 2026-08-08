@@ -75,7 +75,7 @@ console.log('   檔案：' + OUT_FILE);
 console.log('   大小：' + kb + ' KB（單檔、無外部相依）');
 console.log('   規則表版本：' + rules.meta.version + '（更新日 ' + rules.meta.updated + '）');
 
-/* ── 病人衛教單張（A4 可列印，靜態內容、無需注入規則表）── */
+/* ── 病人衛教單張（雙面列印，紙張用 A4∩Letter 交集尺寸，兩種紙匣都能直接印）── */
 const LEAFLET_SRC = path.join(SRC, 'leaflet.template.html');
 const LEAFLET_OUT = path.join(OUT_DIR, '肺炎鏈球菌疫苗病人衛教單張.html');
 if (fs.existsSync(LEAFLET_SRC)) {
@@ -97,5 +97,5 @@ if (fs.existsSync(LEAFLET_SRC)) {
 
   fs.writeFileSync(LEAFLET_OUT, leaflet, 'utf8');
   const lkb = (Buffer.byteLength(leaflet, 'utf8') / 1024).toFixed(1);
-  console.log('✅ 衛教單張：' + LEAFLET_OUT + '（' + lkb + ' KB，A4 可列印）');
+  console.log('✅ 衛教單張：' + LEAFLET_OUT + '（' + lkb + ' KB，雙面列印，A4／Letter 皆可）');
 }
