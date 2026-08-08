@@ -22,7 +22,7 @@
 - [x] 階段四：PowerPoint 簡報 **56 張**（含免疫橋接教學模組 7 頁、四張新增圖表）
 - [x] 階段五：A4 病人衛教單張 —— **維持雙面兩頁**，兩面各約 234／239mm，可容忍 Letter 紙匣與瀏覽器頁首頁尾
 - [x] 階段六：總驗收 —— 11 條驗收條件全過，自動化為 `src/acceptance.py`；2 項規格偏離待使用者確認
-- [ ] 待辦：`.pptx` 複製一份到 OneDrive 備份（依檔案放置約定，不進 git）
+- [x] 待辦：`.pptx` 已複製到 `C:\Users\phili\OneDrive\文件\肺炎鏈球菌疫苗產出\`（2026-08-09）
 
 ## 資料夾結構
 
@@ -62,7 +62,7 @@ C:\projects\pneumonia-clinic\
 | 東西 | 放哪 | 理由 |
 |------|------|------|
 | HTML 報告、衛教單張、規則表、查證摘錄 | 本 repo（git） | 純文字、需版控、無敏感資料 |
-| PowerPoint 產出（`.pptx`） | 產生在 `output\`，另複製一份到 OneDrive | 二進位檔不適合 git；依全域檔案分工鐵律，Office 產出走 OneDrive |
+| PowerPoint 產出（`.pptx`） | 產生在 `output\`，另複製到 `OneDrive\文件\肺炎鏈球菌疫苗產出\` | 二進位檔不適合 git；依全域檔案分工鐵律，Office 產出走 OneDrive |
 | 病人資料 | **不存在** | 本專案不使用任何病人資料 |
 
 ## 工作約定
