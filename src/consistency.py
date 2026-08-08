@@ -128,6 +128,48 @@ def main():
                 print('  ✗ %s 缺少「%s」' % (name, c))
     print()
 
+    # 4. 血清型組成與疫苗語意色：簡報產生器與 HTML 報告必須逐字同源
+    #    （曾發生報告把血清型 20 與 20A 拆成兩欄、與自己的內文矛盾，也與簡報不一致）
+    print('【4】血清型組成與疫苗語意色（deck.js vs report.template.html）')
+    deck_src = open(os.path.join(ROOT, 'src', 'deck.js'), encoding='utf-8').read()
+    rep_src = open(os.path.join(ROOT, 'src', 'report.template.html'), encoding='utf-8').read()
+
+    def sero_sets(text):
+        got = {}
+        for v in ('PPV23', 'PCV13', 'PCV20', 'PCV21'):
+            m = re.search(v + r"\s*:\s*\[([^\]]*)\]", text)
+            if m:
+                got[v] = set(re.findall(r"'([^']+)'", m.group(1)))
+        return got
+
+    a, b = sero_sets(deck_src), sero_sets(rep_src)
+    valency = {'PPV23': 23, 'PCV13': 13, 'PCV20': 20, 'PCV21': 21}
+    for v, n in valency.items():
+        if v not in a or v not in b:
+            fails += 1
+            print('  ✗ %s 在其中一份找不到組成定義' % v)
+        elif a[v] != b[v]:
+            fails += 1
+            print('  ✗ %s 兩份不一致，差異：%s' % (v, sorted(a[v] ^ b[v])))
+        elif len(a[v]) != n:
+            fails += 1
+            print('  ✗ %s 型數為 %d，應為 %d' % (v, len(a[v]), n))
+        else:
+            print('  ✓ %s 兩份一致且為 %d 型' % (v, n))
+
+    for key, var in (('PPV23', 'ppv23'), ('PCV13', 'pcv13'), ('PCV20', 'pcv20'), ('PCV21', 'pcv21')):
+        md = re.search(key + r"\s*:\s*'([0-9A-Fa-f]{6})'", deck_src)
+        mr = re.search(r"--" + var + r"\s*:\s*#([0-9A-Fa-f]{6})", rep_src)
+        if not md or not mr:
+            fails += 1
+            print('  ✗ %s 語意色在其中一份找不到' % key)
+        elif md.group(1).lower() != mr.group(1).lower():
+            fails += 1
+            print('  ✗ %s 語意色不一致：deck #%s vs report #%s' % (key, md.group(1), mr.group(1)))
+        else:
+            print('  ✓ %s 語意色一致 #%s' % (key, md.group(1).lower()))
+    print()
+
     print('─' * 52)
     if fails:
         print('❌ %d 項未通過' % fails)

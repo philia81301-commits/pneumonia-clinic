@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>肺炎鏈球菌疫苗 病人衛教單張</title>
 <style>
-  /* 雙面列印（A4 兩面）。字級以 50 歲以上讀者為準，不為了塞單頁而縮小。 */
-  @page{ size:A4; margin:10mm; }
+  /* 雙面列印（A4 兩面）。字級以 50 歲以上讀者為準，不為了塞單頁而縮小。
+     ★ 紙張容錯：影印機紙匣有時放的是 Letter（215.9 × 279.4mm）。
+       Letter 比 A4 寬 5.9mm，但短 17.6mm —— 風險全在垂直方向，照 A4 排到滿會被裁掉底部。
+       真正決定會不會被裁的是「內容實際結束在哪」，不是邊界設多大：
+       目前兩面內容約 234 / 239mm，加上緣 12mm 後結束在 251mm，距 Letter 的 279.4mm 還有 28mm。
+     ★ 第二個坑：瀏覽器列印若開著「頁首及頁尾」，Chrome 會在邊界內再吃掉上下各約 12mm。
+       因此可用高度取 269mm 而非塞到滿，開著頁首頁尾時仍有約 245mm 可用，足夠放下 239mm。
+       （建議仍關掉頁首頁尾——病人衛教單張不需要印出檔案路徑。）
+     ★ 側邊 15mm 是觀感需求，不是容錯需要（Letter 較寬，橫向沒有風險）。 */
+  @page{ size:A4; margin:12mm 15mm 16mm; }
   :root{
     --ink:#1a2430; --ink2:#4c5c68; --line:#cfdbe2;
     --main:#0f4c5c; --soft:#e6f0f4; --ok:#1c6b48; --okbg:#e6f4ec;
@@ -15,36 +23,39 @@
   *{box-sizing:border-box}
   body{margin:0;background:#eef2f5;color:var(--ink);
     font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
-    font-size:15px;line-height:1.6}
-  .page{width:210mm;margin:14px auto;padding:10mm;background:#fff;
+    font-size:15px;line-height:1.55}
+  .page{width:210mm;margin:14px auto;padding:12mm 15mm 16mm;background:#fff;
     box-shadow:0 2px 14px rgba(0,0,0,.12)}
   h1{margin:0 0 2px;font-size:24px;color:var(--main);line-height:1.3}
   .sub{margin:0;font-size:14px;color:var(--ink2)}
-  .hd{border-bottom:3px solid var(--main);padding-bottom:7px;margin-bottom:10px}
-  h2{font-size:18.5px;margin:14px 0 5px;color:var(--main);display:flex;align-items:center;gap:8px}
+  .hd{border-bottom:3px solid var(--main);padding-bottom:6px;margin-bottom:9px}
+  h2{font-size:18.5px;margin:11px 0 4px;color:var(--main);display:flex;align-items:center;gap:8px}
   h2 .n{display:inline-flex;align-items:center;justify-content:center;
     width:25px;height:25px;border-radius:50%;background:var(--main);color:#fff;font-size:15px;flex:none}
-  p{margin:5px 0}
-  .box{border-radius:8px;padding:9px 13px;margin:8px 0}
+  p{margin:4px 0}
+  .box{border-radius:8px;padding:7px 12px;margin:6px 0}
   .box.main{background:var(--soft)}
   .box.ok{background:var(--okbg)}
-  .box.ok p{margin:3px 0}
+  .box.ok p{margin:2px 0}
   .box.warn{background:var(--warnbg)}
   .box.bad{background:var(--badbg)}
   .big{font-size:18.5px;font-weight:800;color:var(--main)}
-  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:7px 0}
-  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:middle}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:5px 0}
+  th,td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:middle}
   th{background:var(--soft);color:var(--main);font-weight:700;white-space:nowrap}
   .yes{color:var(--ok);font-weight:800}
   .no{color:var(--bad);font-weight:800}
   .fine{font-size:13.5px;color:var(--ink2);line-height:1.5}
-  ul{margin:5px 0;padding-left:22px}
-  li{margin:2px 0}
-  .qa{margin:7px 0}
-  .qa dt{font-weight:800;color:var(--main);margin-top:7px;font-size:15.5px}
-  .qa dd{margin:2px 0 0 0;color:var(--ink)}
-  .foot{margin-top:12px;padding-top:8px;border-top:1px solid var(--line);
-    font-size:12.5px;color:var(--ink2);line-height:1.55}
+  ul{margin:4px 0;padding-left:22px}
+  li{margin:1px 0}
+  .qa{margin:4px 0}
+  .qa dt{font-weight:800;color:var(--main);margin-top:4px;font-size:15.5px}
+  .qa dd{margin:0;color:var(--ink)}
+  /* 頁尾整塊不可被拆頁：寧可整塊移動，也不要只掉一行到下一頁 */
+  .foot{margin-top:8px;padding-top:6px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--ink2);line-height:1.45;
+    break-inside:avoid;page-break-inside:avoid}
+  .foot p{margin:0}
   /* 第 2 面的起點：固定在此換頁，避免分頁切在表格或色塊中間 */
   .sheet2{break-before:page;page-break-before:always}
   @media print{
@@ -156,8 +167,8 @@
   <div class="foot">
     <p><b>去哪裡打？</b>全台約 <b>2,800 家</b>合約醫療院所，可洽您平常看診的院所，或上疾管署網站、各縣市衛生局查詢。
     <b>資料來源</b>：衛生福利部疾病管制署《成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）》、致醫界通函第 612 號（2026-07-28）；查詢日 2026-08-08。
-    本單張僅供衛教參考，<b>不能取代醫師的診斷與建議</b>；公費資格以合約院所認定為準，政策更新以疾管署公告為準。</p>
-    <p style="margin-top:5px"><b>資料整理</b>：高雄榮民總醫院　家庭醫學部　潘醫師　｜　內容彙整由 Claude 協助</p>
+    本單張僅供衛教參考，<b>不能取代醫師的診斷與建議</b>；公費資格以合約院所認定為準，政策更新以疾管署公告為準。
+    　<b>資料整理</b>：高雄榮民總醫院　家庭醫學部　潘醫師　｜　內容彙整由 Claude 協助</p>
   </div>
 
 </div>

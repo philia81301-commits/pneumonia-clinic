@@ -9,7 +9,11 @@
     --bg:#f7f9fb; --card:#fff; --ink:#1a2531; --ink2:#4a5b6d; --line:#dfe6ee;
     --accent:#1f6f8b; --accent-l:#e8f2f6; --warn:#b45309; --warn-l:#fef6e7;
     --bad:#b32d2d; --bad-l:#fdeeee; --ok:#1e7a52; --ok-l:#e8f6ef;
-    --pcv20:#2f6fb5; --pcv21:#b5642f; --shared:#5b7a8c;
+    /* 疫苗語意色：世代由舊到新、色階由淺到深。
+       ★ 必須與 src/deck.js 的 V{} 保持同值，簡報與本報告是同一套語意。
+       ★ 只用於疫苗本身的呈現（矩陣、色票、疫苗名），不挪作一般裝飾色。 */
+    --ppv23:#a9c9d4; --pcv13:#6ba3b5; --pcv15:#6ba3b5;
+    --pcv20:#2e7f9b; --pcv21:#0f4c5c; --shared:#5f7783;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);
@@ -55,9 +59,13 @@
   .mx th,.mx td{padding:5px 4px;text-align:center;white-space:nowrap;border:1px solid var(--line)}
   .mx th.vx{text-align:left;position:sticky;left:0;background:#eef3f7;z-index:2;min-width:74px}
   .mx td.vx{text-align:left;position:sticky;left:0;background:#fff;font-weight:700;z-index:2}
-  .dot{display:inline-block;width:13px;height:13px;border-radius:50%;background:#cfd8e0}
-  .dot.on{background:var(--accent)}
-  .mx td.hl .dot.on{background:#d97706}
+  .dot{display:inline-block;width:13px;height:13px;border-radius:50%;background:#e3eaef}
+  /* 每一列用該疫苗自己的語意色，與簡報的血清型矩陣同一套 */
+  .mx tr[data-v="PPV23"] .dot.on{background:var(--ppv23)}
+  .mx tr[data-v="PCV13"] .dot.on{background:var(--pcv13)}
+  .mx tr[data-v="PCV20"] .dot.on{background:var(--pcv20)}
+  .mx tr[data-v="PCV21"] .dot.on{background:var(--pcv21)}
+  .mx td.hl .dot.on{outline:2px solid #d97706;outline-offset:1px}
   .mx col.dim,.mx td.dim{opacity:.22}
   .btns{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
   button{font:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--line);background:#fff;
@@ -1232,9 +1240,14 @@ var PNEUMO_RULES = {
     PCV13: ['1','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F'],
     PCV20: ['1','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F','8','10A','11A','12F','15B','22F','33F'],
     PCV21: ['3','6A','7F','8','9N','10A','11A','12F','15A','15C','16F','17F','19A','20A','22F','23A','23B','24F','31','33F','35B'],
-    PPV23: ['1','2','3','4','5','6B','7F','8','9N','9V','10A','11A','12F','14','15B','17F','18C','19A','19F','20','22F','23F','33F']
+    // PPV23 仿單列為血清型 20，PCV21 列為 20A；SAVE 研究的交集分析把兩者視為同一型
+    // （「9N、17F、20A —— PPV23 有但 PCV20 沒有」），故本表併為同一欄，與簡報的矩陣一致
+    PPV23: ['1','2','3','4','5','6B','7F','8','9N','9V','10A','11A','12F','14','15B','17F','18C','19A','19F','20A','22F','23F','33F']
   };
-  var ORDER = ['1','2','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F','8','10A','11A','12F','15B','22F','33F','9N','17F','20','20A','15A','15C','16F','23A','23B','24F','31','35B'];
+  // 欄序＝四支疫苗血清型的聯集，依「PCV20 有／兩者共有／PCV21 有／僅 PPV23」分帶排列
+  var ORDER = ['1','4','5','6B','9V','14','15B','18C','19F','23F',
+               '3','6A','7F','8','10A','11A','12F','19A','22F','33F',
+               '9N','15A','15C','16F','17F','20A','23A','23B','24F','31','35B','2'];
   var GROUPS = {
     shared:  ['3','6A','7F','8','10A','11A','12F','19A','22F','33F'],
     only20:  ['1','4','5','6B','9V','14','18C','19F','23F'],
@@ -1244,8 +1257,9 @@ var PNEUMO_RULES = {
   var mx = document.getElementById('mx'), html = '<thead><tr><th class="vx">疫苗</th>';
   ORDER.forEach(function(s){ html += '<th data-s="'+s+'">'+s+'</th>'; });
   html += '</tr></thead><tbody>';
-  ['PCV13','PCV20','PCV21','PPV23'].forEach(function(v){
-    html += '<tr><td class="vx">'+v+'</td>';
+  // 列序由舊到新，與簡報一致
+  ['PPV23','PCV13','PCV20','PCV21'].forEach(function(v){
+    html += '<tr data-v="'+v+'"><td class="vx">'+v+'</td>';
     ORDER.forEach(function(s){
       var on = SERO[v].indexOf(s) !== -1;
       html += '<td data-s="'+s+'"><span class="dot'+(on?' on':'')+'"></span></td>';

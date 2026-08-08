@@ -11,6 +11,7 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
 const fs = require('fs');
+const RULES = require('./rules.json');   // 政策文字取自單一規則表，避免簡報與決策器各自寫死
 
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_WIDE';          // 13.3 × 7.5 英吋
@@ -37,6 +38,21 @@ const C = {
   okBg:  'E7F4EE',
   line:  'D3E0E6'
 };
+
+/* ── 疫苗語意色：世代由舊到新、色階由淺到深 ──
+   ★ 約束：這五個色只代表疫苗，且只用在**資料呈現**（圖表、矩陣、表格的疫苗欄）。
+     投影片本身的裝飾（章節頁編號、標題）不受此約束，但資料區塊內不得把這幾色挪作他用，
+     也不得在圖表裡臨時另配一套顏色。
+   ★ HTML 報告 report.template.html 的 --ppv23/--pcv13/--pcv20/--pcv21/--shared 必須與此同值。 */
+const V = {
+  PPV23:  'A9C9D4',
+  PCV13:  '6BA3B5',
+  PCV15:  '6BA3B5',   // 與 PCV13 同世代，共用色階
+  PCV20:  '2E7F9B',
+  PCV21:  '0F4C5C',
+  shared: '5F7783'    // 「兩者共有」用中性色，不歸屬任何一支（夠深，可直接當文字色）
+};
+
 const F = 'Microsoft JhengHei';
 
 let n = 0;
@@ -279,24 +295,42 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, 'IPD 確定病例逐年上升', '台灣流病');
-  s.addChart(pres.ChartType.bar, [{
-    name: '確定病例數',
-    labels: ['2021', '2022', '2023', '2024', '2025'],
-    values: [196, 200, 287, 315, 347]
-  }], {
-    x: M, y: 2.1, w: CW, h: 4.0,
-    barDir: 'col', chartColors: [C.mid],
-    showTitle: false, showLegend: false,
-    showValue: true, dataLabelPosition: 'outEnd',
-    dataLabelFontFace: F, dataLabelFontSize: 16, dataLabelFontBold: true, dataLabelColor: C.ink,
+  head(s, 'IPD 病例逐年上升，死亡數未同步增加', '台灣流病');
+  const YR = ['2021', '2022', '2023', '2024', '2025'];
+  s.addChart([
+    {
+      type: pres.ChartType.bar,
+      data: [{ name: '確定病例數', labels: YR, values: [196, 200, 287, 315, 347] }],
+      options: {
+        barDir: 'col', chartColors: [C.mid], barGapWidthPct: 55,
+        showValue: true, dataLabelPosition: 'outEnd',
+        dataLabelFontFace: F, dataLabelFontSize: 15, dataLabelFontBold: true, dataLabelColor: C.ink
+      }
+    },
+    {
+      type: pres.ChartType.line,
+      data: [{ name: '死亡數', labels: YR, values: [19, 20, 39, 36, 36] }],
+      options: {
+        chartColors: [C.warn], lineSize: 3, lineSmooth: false,
+        lineDataSymbol: 'circle', lineDataSymbolSize: 8, lineDataSymbolLineColor: C.warn,
+        showValue: true, dataLabelPosition: 'b',
+        dataLabelFontFace: F, dataLabelFontSize: 13, dataLabelFontBold: true, dataLabelColor: C.warn
+      }
+    }
+  ], {
+    x: M, y: 2.05, w: CW, h: 3.75,
+    showTitle: false, showLegend: true, legendPos: 'b',
+    legendFontFace: F, legendFontSize: 14, legendColor: C.ink2,
     catAxisLabelFontFace: F, catAxisLabelFontSize: 16, catAxisLabelColor: C.ink2,
-    valAxisLabelFontFace: F, valAxisLabelFontSize: 14, valAxisLabelColor: C.ink2,
+    valAxisLabelFontFace: F, valAxisLabelFontSize: 13, valAxisLabelColor: C.ink2,
     valGridLine: { color: C.line, size: 1 }, catGridLine: { style: 'none' },
     valAxisMaxVal: 400
   });
-  foot(s, '疾管署法定傳染病統計｜2025 年 347 例、死亡 36 例｜查詢日 2026-08-07');
-  note(s, '2021 年 196 例到 2025 年 347 例，五年將近倍增。');
+  callout(s, M, 5.95, CW, 0.80,
+    '五年病例數近倍增（196 → 347），同期死亡數自 2023 年起持平在 36–39 例', 'info', 18);
+  foot(s, '疾管署法定傳染病統計｜查詢日 2026-08-07');
+  note(s, '兩條線一起看：病例數上升是分母變大，死亡數持平代表致死率相對下降，'
+    + '但這是法定傳染病通報資料，不是校正過的族群研究，不要過度解讀成「疫苗讓死亡下降」。');
 }
 
 {
@@ -357,13 +391,124 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   note(s, '');
 }
 
+/* 血清型涵蓋矩陣：本節總覽，後面各頁再逐帶拆解
+   32 欄 ＝ 四支疫苗血清型的聯集；分帶依 data/02「PCV20 vs PCV21 交集分析」
+   欄標與格子必然小於全域 20–24pt 規範 —— 這是參照用的總覽頁，結論句仍維持大字 */
+{
+  const s = slide();
+  head(s, '四支疫苗涵蓋的不是同一群血清型', '血清型組成');
+
+  // 各疫苗組成（data/02，查詢日 2026-08-07）
+  const SEROTYPES = {
+    PPV23: ['1','2','3','4','5','6B','7F','8','9N','9V','10A','11A','12F','14','15B','17F','18C','19A','19F','20A','22F','23F','33F'],
+    PCV13: ['1','3','4','5','6A','6B','7F','9V','14','18C','19A','19F','23F'],
+    PCV20: ['1','3','4','5','6A','6B','7F','8','9V','10A','11A','12F','14','15B','18C','19A','19F','22F','23F','33F'],
+    PCV21: ['3','6A','7F','8','9N','10A','11A','12F','15A','15C','16F','17F','19A','20A','22F','23A','23B','24F','31','33F','35B']
+  };
+  const VAX = ['PPV23', 'PCV13', 'PCV20', 'PCV21'].map(id => ({ id: id, color: V[id] }));
+  const BANDS = [
+    { cap: 'PCV20 有、PCV21 無　10 型', sub: '幼兒常規接種產生群體免疫後，\n在成人 IPD 已大幅減少',
+      st: ['1','4','5','6B','9V','14','15B','18C','19F','23F'] },
+    { cap: '兩者共有　10 型', sub: '選哪一支都涵蓋，\n不是選擇的考量點',
+      st: ['3','6A','7F','8','10A','11A','12F','19A','22F','33F'] },
+    { cap: 'PCV21 有、PCV20 無　11 型', sub: '含 15A、23A、35B 等\n成人 IPD 現行主流型',
+      st: ['9N','15A','15C','16F','17F','20A','23A','23B','24F','31','35B'] },
+    { cap: '', sub: '', st: ['2'] }
+  ];
+
+  // ── 建置期自我驗算：數字錯了寧可讓 build 失敗，也不要印出錯的圖 ──
+  const valency = { PPV23: 23, PCV13: 13, PCV20: 20, PCV21: 21 };
+  Object.keys(valency).forEach(k => {
+    if (SEROTYPES[k].length !== valency[k] || new Set(SEROTYPES[k]).size !== valency[k]) {
+      throw new Error('血清型矩陣：' + k + ' 價數不符或有重複');
+    }
+  });
+  const cols = BANDS.reduce((a, b) => a.concat(b.st), []);
+  const union = new Set([].concat(...Object.values(SEROTYPES)));
+  if (cols.length !== union.size || new Set(cols).size !== cols.length || !cols.every(t => union.has(t))) {
+    throw new Error('血清型矩陣：分帶欄位與四支疫苗聯集不一致');
+  }
+  const inV = (v, t) => SEROTYPES[v].indexOf(t) >= 0;
+  if (!BANDS[0].st.every(t => inV('PCV20', t) && !inV('PCV21', t)) ||
+      !BANDS[1].st.every(t => inV('PCV20', t) && inV('PCV21', t)) ||
+      !BANDS[2].st.every(t => inV('PCV21', t) && !inV('PCV20', t)) ||
+      !BANDS[3].st.every(t => inV('PPV23', t) && !inV('PCV13', t) && !inV('PCV20', t) && !inV('PCV21', t))) {
+    throw new Error('血清型矩陣：分帶語意與組成表不符');
+  }
+
+  // ── 版面 ──
+  const CELL = 0.30, ROWH = 0.46, BGAP = 0.18, LABW = 1.20;
+  const gridW = cols.length * CELL + (BANDS.length - 1) * BGAP;
+  const X0 = (W - (LABW + gridW)) / 2;
+  const GX = X0 + LABW;
+  const bandX = [];
+  let cx = GX;
+  BANDS.forEach(b => { bandX.push(cx); cx += b.st.length * CELL + BGAP; });
+  const colX = t => {
+    for (let b = 0; b < BANDS.length; b++) {
+      const i = BANDS[b].st.indexOf(t);
+      if (i >= 0) return bandX[b] + i * CELL;
+    }
+    return null;
+  };
+
+  // 分帶標題（第四帶僅 1 欄，說明改放註解列）
+  BANDS.forEach((b, bi) => {
+    if (!b.cap) return;
+    const bw = b.st.length * CELL;
+    s.addText(b.cap, {
+      x: bandX[bi], y: 1.88, w: bw, h: 0.30, fontFace: F, fontSize: 13, bold: true,
+      color: C.deep, align: 'center', valign: 'middle', margin: 0
+    });
+    s.addText(b.sub, {
+      x: bandX[bi] - 0.1, y: 2.18, w: bw + 0.2, h: 0.46, fontFace: F, fontSize: 10.5,
+      color: C.ink2, align: 'center', valign: 'top', margin: 0
+    });
+  });
+
+  // 血清型欄標
+  cols.forEach(t => {
+    s.addText(t, {
+      x: colX(t), y: 2.70, w: CELL, h: 0.26, fontFace: F, fontSize: 8.5, bold: true,
+      color: C.ink2, align: 'center', valign: 'middle', margin: 0
+    });
+  });
+
+  // 四列：深色＝涵蓋
+  VAX.forEach((v, vi) => {
+    const y = 2.98 + vi * ROWH;
+    s.addText(v.id, {
+      x: X0, y: y, w: LABW - 0.12, h: ROWH, fontFace: F, fontSize: 15, bold: true,
+      color: v.color, align: 'right', valign: 'middle', margin: 0
+    });
+    cols.forEach(t => {
+      s.addShape(pres.ShapeType.rect, {
+        x: colX(t) + 0.015, y: y + 0.04, w: CELL - 0.03, h: ROWH - 0.08,
+        fill: { color: inV(v.id, t) ? v.color : 'EDF2F5' }, line: { width: 0 }
+      });
+    });
+  });
+
+  s.addText('深色＝該疫苗涵蓋該血清型　│　最右欄（血清型 2）僅 PPV23 涵蓋　│　PPV23 不含 6A（仿單確認中）；20A 欄 PPV23 仿單列為 20\n'
+    + 'PCV21 有、PCV20 無的 11 型中，15A、15C、16F、23A、23B、24F、31、35B 共 8 型為全新血清型，其他三支均不涵蓋', {
+    x: M, y: 4.98, w: CW, h: 0.48, fontFace: F, fontSize: 10.5, color: C.ink2, valign: 'top'
+  });
+
+  callout(s, M, 5.50, CW, 1.15,
+    'PCV20 比 PCV21 多 10 型、PCV21 比 PCV20 多 11 型\n兩者是不同的取捨，不是價數多寡的關係', 'warn', 20);
+
+  foot(s, 'SAVE study. J Antimicrob Chemother 2025;80(5):1377（PMID 40131289）｜查詢日 2026-08-07');
+  note(s, '這頁是本節的總覽：先讓大家看見「兩邊各多一塊、中間共有一塊」的形狀，後面三頁再把每一塊的內容念出來。'
+    + '不要逐格講解，指三個分帶就好。');
+}
+
 {
   const s = slide();
   head(s, '兩者共有 10 型', 'PCV20 vs PCV21');
   card(s, M, 2.3, CW, 1.5);
   s.addText('3　6A　7F　8　10A　11A　12F　19A　22F　33F', {
     x: M, y: 2.3, w: CW, h: 1.5, fontFace: F, fontSize: 30, bold: true,
-    color: C.deep, align: 'center', valign: 'middle', margin: 0
+    color: V.shared, align: 'center', valign: 'middle', margin: 0
   });
   s.addText('這 10 型無論選哪一支都涵蓋，不是選擇的考量點。', {
     x: M, y: 4.2, w: CW, h: 0.6, fontFace: F, fontSize: 21, bold: true, color: C.ink
@@ -378,7 +523,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   card(s, M, 2.3, CW, 1.4);
   s.addText('1　4　5　6B　9V　14　18C　19F　23F', {
     x: M, y: 2.3, w: CW, h: 1.4, fontFace: F, fontSize: 32, bold: true,
-    color: C.mid, align: 'center', valign: 'middle', margin: 0
+    color: V.PCV20, align: 'center', valign: 'middle', margin: 0
   });
   callout(s, M, 4.0, CW, 1.5,
     '這 9 型因幼兒常規接種產生群體免疫，\n在成人 IPD 已大幅減少', 'info');
@@ -389,10 +534,10 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 {
   const s = slide();
   head(s, 'PCV21 獨有 11 型', 'PCV20 vs PCV21');
-  card(s, M, 2.2, CW, 1.35, C.badBg);
+  card(s, M, 2.2, CW, 1.35, V.PCV21);
   s.addText('15A　15C　16F　23A　23B　24F　31　35B', {
     x: M, y: 2.2, w: CW, h: 1.35, fontFace: F, fontSize: 30, bold: true,
-    color: C.bad, align: 'center', valign: 'middle', margin: 0
+    color: 'FFFFFF', align: 'center', valign: 'middle', margin: 0
   });
   s.addText('以上 8 型為全新血清型，其他疫苗均不涵蓋', {
     x: M, y: 3.65, w: CW, h: 0.5, fontFace: F, fontSize: 18, bold: true, color: C.ink2, align: 'center'
@@ -425,14 +570,14 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   head(s, '兩套不同的設計哲學', '設計理念');
   card(s, M, 2.2, 5.9, 2.6);
   s.addText([
-    { text: 'PCV20', options: { breakLine: true, fontSize: 26, color: C.mid } },
+    { text: 'PCV20', options: { breakLine: true, fontSize: 26, color: V.PCV20 } },
     { text: '延續幼兒型架構\n往上加價數', options: { fontSize: 21, color: C.ink } }
   ], { x: M + 0.35, y: 2.5, w: 5.2, h: 2.0, fontFace: F, bold: true, valign: 'top' });
 
-  card(s, 6.9, 2.2, CW - 6.2, 2.6, C.badBg);
+  card(s, 6.9, 2.2, CW - 6.2, 2.6, V.PCV21);
   s.addText([
-    { text: 'PCV21', options: { breakLine: true, fontSize: 26, color: C.bad } },
-    { text: '為成人重新設計\n捨棄已消退的型、納入現行主流型', options: { fontSize: 21, color: C.ink } }
+    { text: 'PCV21', options: { breakLine: true, fontSize: 26, color: 'FFFFFF' } },
+    { text: '為成人重新設計\n捨棄已消退的型、納入現行主流型', options: { fontSize: 21, color: 'E8F1F4' } }
   ], { x: 7.25, y: 2.5, w: CW - 6.9, h: 2.0, fontFace: F, bold: true, valign: 'top' });
 
   callout(s, M, 5.2, CW, 1.0,
@@ -615,14 +760,60 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
+  head(s, '證據的三個層級', '效力證據');
+  // 階梯高度代表「距離臨床終點的遠近」，不代表保護力高低（下方 callout 必須一起講）
+  const TIER = [
+    { t: '直接證據', k: '臨床終點 RCT', d: '隨機分派，以肺炎／IPD 發病為終點', v: ['PCV13'], h: 3.55 },
+    { t: '間接證據', k: '觀察性研究', d: '有臨床終點，但非隨機分派', v: ['PPV23'], h: 2.95 },
+    { t: '替代指標', k: '免疫橋接', d: '比 OPA 效價，不是臨床終點', v: ['PCV15', 'PCV20', 'PCV21'], h: 2.50 }
+  ];
+  const TW = 3.6, TGAP = 0.55, TBOT = 5.72, CHIPY = 5.00, INNER = TW - 0.44;
+  TIER.forEach((t, i) => {
+    const x = M + i * (TW + TGAP), y = TBOT - t.h;
+    card(s, x, y, TW, t.h, C.soft);
+    s.addText(t.t, {
+      x: x + 0.22, y: y + 0.16, w: INNER, h: 0.34, fontFace: F, fontSize: 15, bold: true,
+      color: C.ink2, margin: 0
+    });
+    s.addText(t.k, {
+      x: x + 0.22, y: y + 0.52, w: INNER, h: 0.52, fontFace: F, fontSize: 22, bold: true,
+      color: C.deep, margin: 0
+    });
+    s.addText(t.d, {
+      x: x + 0.22, y: y + 1.06, w: INNER, h: 0.62, fontFace: F, fontSize: 14,
+      color: C.ink2, valign: 'top', margin: 0
+    });
+    // 疫苗色票橫排並底部對齊，三欄的色票在同一水平線上
+    const cw = Math.min(1.85, (INNER - (t.v.length - 1) * 0.08) / t.v.length);
+    t.v.forEach((vid, j) => {
+      const cx = x + 0.22 + j * (cw + 0.08);
+      s.addShape(pres.ShapeType.roundRect, {
+        x: cx, y: CHIPY, w: cw, h: 0.46, rectRadius: 0.10,
+        fill: { color: V[vid] }, line: { width: 0 }
+      });
+      s.addText(vid, {
+        x: cx, y: CHIPY, w: cw, h: 0.46, fontFace: F, fontSize: 15, bold: true,
+        color: 'FFFFFF', align: 'center', valign: 'middle', margin: 0
+      });
+    });
+  });
+  callout(s, M, 5.90, CW, 0.85,
+    '階梯講的是證據「類型」，不是保護力高低——四支之間沒有頭對頭療效試驗可以比優劣', 'bad', 18);
+  foot(s, 'Hum Vaccin Immunother 2025／2026；內科學誌 2025;36(6):381-386｜查詢日 2026-08-07');
+  note(s, '這頁是整節的骨架。最容易被誤讀成「PCV21 證據最弱所以比較差」——'
+    + '要主動說明：新疫苗不做臨床終點試驗是因為對照組已有有效疫苗，做安慰劑對照不合倫理。');
+}
+
+{
+  const s = slide();
   head(s, '證據等級一覽', '效力證據');
   const rows = [
     [th('疫苗'), th('證據類型'), th('說明')],
-    [td('PPV23', { bold: true }), td('觀察性研究'), td('對 IPD 有保護；對肺炎證據不一致')],
-    [td('PCV13', { bold: true }), td('臨床終點 RCT', { bold: true, color: C.ok }), td('CAPiTA，84,496 人')],
-    [td('PCV15', { bold: true }), td('免疫橋接'), td('以安全性與免疫原性核准')],
-    [td('PCV20', { bold: true }), td('免疫橋接'), td('13 型橋接 PCV13；7 型橋接 PPSV23')],
-    [td('PCV21', { bold: true }), td('免疫橋接'), td('頭對頭：11 個獨有型中 10 個優效')]
+    [td('PPV23', { bold: true, color: V.PPV23 }), td('觀察性研究'), td('對 IPD 有保護；對肺炎證據不一致')],
+    [td('PCV13', { bold: true, color: V.PCV13 }), td('臨床終點 RCT', { bold: true, color: C.ok }), td('CAPiTA，84,496 人')],
+    [td('PCV15', { bold: true, color: V.PCV15 }), td('免疫橋接'), td('以安全性與免疫原性核准')],
+    [td('PCV20', { bold: true, color: V.PCV20 }), td('免疫橋接'), td('13 型橋接 PCV13；7 型橋接 PPSV23')],
+    [td('PCV21', { bold: true, color: V.PCV21 }), td('免疫橋接'), td('頭對頭：11 個獨有型中 10 個優效')]
   ];
   table(s, M, 2.15, CW, rows, [2.4, 3.6, CW - 6.0], 19, CONTENT_BOTTOM - 2.15);
   foot(s, '詳見各頁出處｜查詢日 2026-08-07');
@@ -632,16 +823,36 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 {
   const s = slide();
   head(s, 'CAPiTA 的三個終點', '效力證據');
-  const rows = [
-    [th('終點'), th('疫苗效力'), th('信賴區間')],
-    [td('疫苗血清型社區型肺炎（主要）', { bold: true }), td('45.56%', { bold: true, color: C.deep }), td('95.2% CI 21.82–62.49')],
-    [td('非菌血性／非侵襲性 VT-CAP'), td('45.00%'), td('95.2% CI 14.21–65.31')],
-    [td('疫苗血清型侵襲性疾病', { bold: true }), td('75.00%', { bold: true, color: C.deep }), td('95% CI 41.43–90.78')]
+  // 這是 PCV13 的資料，柱色用 PCV13 的語意色；信賴區間比照文獻圖表放在軸下方一列
+  const EP = [
+    { lab: 'VT-CAP（主要終點）', ve: 45.56, ci: '95.2% CI\n21.82 – 62.49' },
+    { lab: '非菌血性 VT-CAP', ve: 45.00, ci: '95.2% CI\n14.21 – 65.31' },
+    { lab: 'VT-IPD', ve: 75.00, ci: '95% CI\n41.43 – 90.78' }
   ];
-  table(s, M, 2.15, CW, rows, [5.6, 2.8, CW - 8.4], 20, 2.5);
-  callout(s, M, 4.9, CW, 1.55, '信賴區間是 95.2% 而非 95%\n（期中分析 alpha 消耗），引用時照抄', 'warn', 23);
-  foot(s, 'PMID 26076136｜查詢日 2026-08-07');
-  note(s, '95.2% 這個細節，被問到時答得出來會很加分。');
+  s.addChart(pres.ChartType.bar, [{
+    name: '疫苗效力 VE', labels: EP.map(e => e.lab), values: EP.map(e => e.ve)
+  }], {
+    x: M, y: 1.95, w: CW, h: 3.05,
+    barDir: 'col', chartColors: [V.PCV13], barGapWidthPct: 110,
+    showTitle: false, showLegend: false,
+    showValue: true, dataLabelPosition: 'outEnd', dataLabelFormatCode: '0.00"%"',
+    dataLabelFontFace: F, dataLabelFontSize: 20, dataLabelFontBold: true, dataLabelColor: C.ink,
+    catAxisLabelFontFace: F, catAxisLabelFontSize: 15, catAxisLabelColor: C.ink,
+    valAxisHidden: true, valGridLine: { style: 'none' }, catGridLine: { style: 'none' },
+    valAxisMaxVal: 100
+  });
+  // 三欄信賴區間，對齊三根柱子
+  EP.forEach((e, i) => {
+    s.addText(e.ci, {
+      x: M + CW * (i + 0.5) / 3 - 1.7, y: 5.02, w: 3.4, h: 0.52, fontFace: F, fontSize: 13,
+      color: C.ink2, align: 'center', valign: 'top', margin: 0
+    });
+  });
+  callout(s, M, 5.68, CW, 1.05,
+    '信賴區間是 95.2% 而非 95%（期中分析 alpha 消耗），引用時照抄', 'warn', 20);
+  foot(s, 'Bonten MJM, et al. N Engl J Med 2015;372:1114-25（PMID 26076136）｜VT ＝ 疫苗血清型｜查詢日 2026-08-07');
+  note(s, '三根柱子一起看：兩個肺炎終點都在 45% 上下，侵襲性疾病 75% 明顯更高。'
+    + '95.2% 這個細節，被問到時答得出來會很加分。');
 }
 
 {
@@ -738,6 +949,141 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   note(s, '這頁是全場的骨架，後面每一頁都掛回這三個問題。');
 }
 
+/* 公告原表：大原則先給，後面的步驟一、步驟二再逐項拆解 */
+{
+  const s = slide();
+  head(s, '公告原表：疫苗轉換之銜接原則', '大原則');
+  const rows = [
+    [th('接種對象'), th('過往接種史'), th('公費銜接疫苗')],
+    [td('• 65 歲（含）以上長者\n• 55–64 歲原住民\n• 19–64 歲 IPD\n　高風險對象',
+        { rowspan: 5, bold: true, color: C.deep, valign: 'middle' }),
+     td('從未接種'), td('PCV20 或 PCV21', { bold: true, color: C.ok })],
+    [td('僅接種 PPV23'), td('≥ 1 年　→　PCV20 或 PCV21', { bold: true })],
+    [td('僅接種 PCV13/15'), td('≥ 1 年 *　→　PCV20 或 PCV21', { bold: true })],
+    [td('PCV13/15 ＋ PPV23'), td('已完整接種，無需再接種', { bold: true, color: C.ink2 })],
+    [td('PCV20 或 PCV21'), td('已完整接種，無需再接種', { bold: true, color: C.ink2 })]
+  ];
+  table(s, M, 2.1, CW, rows, [3.1, 3.5, CW - 6.6], 17, 3.35);
+  callout(s, M, 5.6, CW, 1.3,
+    '* IPD 高風險對象、65 歲以上機構住民及洗腎患者為 ≥ 8 週\n' +
+    '註：19–64 歲 IPD 高風險對象，如於 65 歲前完整接種 PCV13/15＋PPV23，' +
+    '可於滿 65 歲（含）且與前劑間隔滿 5 年後，再追加接種 1 劑', 'warn', 17);
+  foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）伍、疫苗轉換之銜接原則｜查詢日 2026-08-08');
+  note(s, '這是公告原表，是整節的權威依據。先讓大家看過原表掌握大原則，後面的步驟一、步驟二再逐項拆解。');
+}
+
+/* 決策流程圖：把上一頁的公告原表畫成一條流程
+   內容全部取自 rules.json（fundedCategories / officialFlow / shortIntervalEligibility /
+   vaccines），與 HTML 報告的決策器共用同一份規則表 —— 不得在此另寫一套判斷 */
+{
+  const s = slide();
+  head(s, '同一份規則，畫成一條流程', '決策總覽');
+
+  const G = RULES.fundedCategories;
+  const FLOW = RULES.officialFlow.groups;
+  const two = FLOW.find(g => g.id === 'two').subs;
+  const SHORT = RULES.shortIntervalEligibility;
+
+  const AX = M, AW = 2.45;                    // 步驟 1
+  const HX = 3.45, HW = 3.05;                 // 步驟 2　接種史
+  const OX = 6.95, OW = 3.05;                 // 步驟 2　銜接規則
+  const CX = 10.5, CW3 = 2.10;                // 步驟 3
+  const Y0 = 2.28, ROWH = 0.60, GAP = 0.06;
+  const rowY = i => Y0 + i * (ROWH + GAP);
+
+  const colHead = (x, w, t) => s.addText(t, {
+    x: x, y: 1.92, w: w, h: 0.30, fontFace: F, fontSize: 13, bold: true,
+    color: C.deep, align: 'center', valign: 'middle', margin: 0
+  });
+  colHead(AX, AW, '步驟 1　公費資格');
+  colHead(HX, OX + OW - HX, '步驟 2　過去打過什麼');
+  colHead(CX, CW3, '步驟 3');
+
+  // ── 步驟 1：三類公費對象（rules.fundedCategories）──
+  const gLabel = { elder65: '65 歲（含）以上', indigenous55: '55–64 歲原住民',
+                   highrisk19: '19–64 歲\nIPD 高風險（5 項）' };
+  G.forEach((g, i) => {
+    const y = 2.67 + i * 1.16;
+    card(s, AX, y, AW, 0.92);
+    s.addText(gLabel[g.id], {
+      x: AX + 0.12, y: y, w: AW - 0.24, h: 0.92, fontFace: F, fontSize: 15, bold: true,
+      color: C.deep, align: 'center', valign: 'middle', margin: 0
+    });
+  });
+  s.addText('符合任一項', {
+    x: AX, y: 5.95, w: AW, h: 0.28, fontFace: F, fontSize: 12, bold: true,
+    color: C.ink2, align: 'center', valign: 'middle', margin: 0
+  });
+  s.addShape(pres.ShapeType.rightArrow, {
+    x: HX - 0.30, y: 4.18, w: 0.26, h: 0.22, fill: { color: C.mid }, line: { width: 0 }
+  });
+
+  // ── 步驟 2：接種史 → 銜接規則（rules.officialFlow）──
+  const short = SHORT.conditions.join('、');
+  const rows = [
+    { h: FLOW.find(g => g.id === 'one').detail.replace('（包含 13、15、20、21 或 23 價疫苗）', ''),
+      o: FLOW.find(g => g.id === 'one').action, tone: 'ok', go: true },
+    { h: two[0].label.replace('（一）', ''), o: two[0].action, tone: 'info', go: true },
+    { h: two[1].label.replace('（二）', ''), o: two[1].action, tone: 'info', go: true },
+    { h: '└ 其中 IPD 高風險、機構住民或洗腎患者', o: '間隔至少 ' + SHORT.label + '\n（登錄加註 ' + SHORT.registrationCode.code + '）',
+      tone: 'warn', go: true, sub: true },
+    { h: 'PCV13/15 ＋ PPV23 完整兩劑',
+      o: '三條件全符合 → 追加 1 劑\n否則視為已完成',
+      tone: 'warn', go: true },
+    { h: '已打過 PCV20 或 PCV21', o: '視為已完成，不再追加', tone: 'stop', go: false }
+  ];
+  const TONE = { ok: [C.okBg, C.ok], info: [C.soft, C.deep], warn: [C.warnBg, C.warn], stop: ['F0F3F5', C.ink2] };
+
+  rows.forEach((r, i) => {
+    const y = rowY(i);
+    const pair = TONE[r.tone];
+    card(s, HX, y, HW, ROWH, r.sub ? 'F7FAFB' : C.soft);
+    s.addText(r.h, {
+      x: HX + (r.sub ? 0.20 : 0.14), y: y, w: HW - 0.34, h: ROWH, fontFace: F,
+      fontSize: r.sub ? 11.5 : 13, bold: !r.sub, color: r.sub ? C.ink2 : C.ink,
+      valign: 'middle', margin: 0
+    });
+    card(s, OX, y, OW, ROWH, pair[0]);
+    s.addText(r.o, {
+      x: OX + 0.14, y: y, w: OW - 0.28, h: ROWH, fontFace: F, fontSize: 12.5, bold: true,
+      color: pair[1], valign: 'middle', margin: 0
+    });
+    if (r.go) {
+      s.addShape(pres.ShapeType.rightArrow, {
+        x: OX + OW + 0.10, y: y + ROWH / 2 - 0.10, w: 0.26, h: 0.20,
+        fill: { color: C.ok }, line: { width: 0 }
+      });
+    }
+  });
+  s.addText('8 週適用對象：' + short + '　│　'
+    + '「三條件」＝先前為 19–64 歲 IPD 高風險 ＋ 滿 65 歲（含）＋ 與前劑間隔滿 5 年，缺一不可', {
+    x: M, y: rowY(rows.length - 1) + ROWH + 0.10, w: CW, h: 0.44, fontFace: F,
+    fontSize: 10, color: C.ink2, valign: 'top'
+  });
+
+  // ── 步驟 3：兩支擇一（rules.vaccines）──
+  const goRows = rows.filter(r => r.go).length;
+  const spanTop = rowY(0), spanBot = rowY(goRows - 1) + ROWH;
+  card(s, CX, (spanTop + spanBot) / 2 - 0.95, CW3, 1.60, C.okBg);
+  s.addText(RULES.vaccines.offered.join('\n或\n'), {
+    x: CX, y: (spanTop + spanBot) / 2 - 0.95, w: CW3, h: 1.10, fontFace: F, fontSize: 17,
+    bold: true, color: C.ok, align: 'center', valign: 'middle', margin: 0
+  });
+  s.addText('擇一接種 1 劑', {
+    x: CX, y: (spanTop + spanBot) / 2 + 0.05, w: CW3, h: 0.55, fontFace: F, fontSize: 13,
+    bold: true, color: C.ink, align: 'center', valign: 'middle', margin: 0
+  });
+  s.addText(RULES.vaccines.choiceNote, {
+    x: CX - 0.05, y: (spanTop + spanBot) / 2 + 0.78, w: CW3 + 0.1, h: 0.80, fontFace: F,
+    fontSize: 10.5, color: C.ink2, align: 'center', valign: 'top', margin: 0
+  });
+
+  foot(s, '公告「伍、疫苗轉換之銜接原則」｜本圖由 rules.json 產生，與 HTML 決策器同源｜查詢日 2026-08-08');
+  note(s, '上一頁是公告原表，這一頁是同一份規則的流程版。講法：左邊三類決定「有沒有公費」，'
+    + '中間五種接種史決定「要等多久」，右邊永遠是同一個結論。最後一列（已打過 PCV20/PCV21）沒有箭頭，代表流程到此結束。'
+    + '第四列的 8 週是第三列的但書，不是獨立的一類。');
+}
+
 {
   const s = slide();
   head(s, '19–64 歲公費高風險：僅這 5 項', '步驟 1　公費資格');
@@ -758,10 +1104,10 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     });
   });
   callout(s, M, 5.5, CW, 1.2,
-    '符合這 5 項只代表「對象資格」，不等於現在就能打。\n' +
-    '還要看過往接種史——已完整接種 PCV13/15＋PPV23 者，仍須滿 65 歲且與前劑間隔 5 年。', 'bad', 19);
+    '這 5 項決定的是「公費對象資格」。\n' +
+    '三類公費對象之後適用完全相同的銜接原則，不因身分別而異。', 'info', 19);
   foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）參、實施對象｜查詢日 2026-08-08');
-  note(s, '兩件事要一起講：一是清單只有這 5 項，糖尿病與 COPD 不在其中；二是符合對象只是第一關，過往接種史決定現在能不能打。未滿 65 歲又已完整接種兩劑的高風險對象，還是要等到 65 歲。');
+  note(s, '重點只有一個：清單就是這 5 項，糖尿病與 COPD 不在其中。公告原表的「接種對象」欄是跨列合併的，三類對象套同一套銜接原則，不要讓聽眾誤以為高風險族群另有一套較嚴的規則。');
 }
 
 {
@@ -802,29 +1148,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   note(s, '這一頁是整場最實用的一頁。');
 }
 
-/* 步驟 2　銜接規則：先看公告原表，再逐項拆解 */
-{
-  const s = slide();
-  head(s, '公告原表：疫苗轉換之銜接原則', '步驟 2　過去打過什麼');
-  const rows = [
-    [th('接種對象'), th('過往接種史'), th('公費銜接疫苗')],
-    [td('• 65 歲（含）以上長者\n• 55–64 歲原住民\n• 19–64 歲 IPD\n　高風險對象',
-        { rowspan: 5, bold: true, color: C.deep, valign: 'middle' }),
-     td('從未接種'), td('PCV20 或 PCV21', { bold: true, color: C.ok })],
-    [td('僅接種 PPV23'), td('≥ 1 年　→　PCV20 或 PCV21', { bold: true })],
-    [td('僅接種 PCV13/15'), td('≥ 1 年 *　→　PCV20 或 PCV21', { bold: true })],
-    [td('PCV13/15 ＋ PPV23'), td('已完整接種，無需再接種', { bold: true, color: C.ink2 })],
-    [td('PCV20 或 PCV21'), td('已完整接種，無需再接種', { bold: true, color: C.ink2 })]
-  ];
-  table(s, M, 2.1, CW, rows, [3.1, 3.5, CW - 6.6], 17, 3.35);
-  callout(s, M, 5.6, CW, 1.3,
-    '* IPD 高風險對象、65 歲以上機構住民及洗腎患者為 ≥ 8 週\n' +
-    '註：19–64 歲 IPD 高風險對象，如於 65 歲前完整接種 PCV13/15＋PPV23，' +
-    '可於滿 65 歲（含）且與前劑間隔滿 5 年後，再追加接種 1 劑', 'warn', 17);
-  foot(s, '成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）伍、疫苗轉換之銜接原則｜查詢日 2026-08-08');
-  note(s, '這是公告原表，是本節的權威依據。先讓大家看過原表，後面四頁再逐項拆解。');
-}
-
+/* 步驟 2　銜接規則：逐項拆解（公告原表已移到決策總覽之後先給） */
 {
   const s = slide();
   head(s, '公告把接種資格分成兩大類', '步驟 2　過去打過什麼');
@@ -875,7 +1199,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 {
   const s = slide();
   head(s, '（二）的但書：誰適用 8 週', '步驟 2　過去打過什麼');
-  const items = ['19–64 歲 IPD 高風險對象', '65 歲以上機構住民', '65 歲以上洗腎患者'];
+  const items = RULES.shortIntervalEligibility.conditions;
   items.forEach((t, i) => {
     const y = 2.3 + i * 1.25;
     card(s, M, y, CW, 1.05, C.badBg);
@@ -885,9 +1209,11 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
       color: C.ink, valign: 'middle', margin: 0
     });
   });
-  callout(s, M, 6.1, CW, 0.75, '限曾接種 13 或 15 價者；其餘情形仍為 1 年', 'info', 19);
+  callout(s, M, 6.1, CW, 0.75,
+    '限曾接種 13 或 15 價者；其餘情形仍為 1 年　｜　登錄時加註身分別代碼「'
+    + RULES.shortIntervalEligibility.registrationCode.code + '」', 'info', 19);
   foot(s, '疾管署 2026-08-10 起實施之公費接種公告｜查詢日 2026-08-08');
-  note(s, '這三種身分只要打過 13 或 15 價，八週後就可以接種新疫苗。');
+  note(s, '這三種身分只要打過 13 或 15 價，八週後就可以接種新疫苗。注意第一項「IPD 高風險對象」公告未限年齡，65 歲以上的高風險者同樣適用 8 週。登錄時記得加註 R02A，統計才分得出來。');
 }
 
 {
@@ -985,19 +1311,32 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 
 {
   const s = slide();
-  head(s, '九種疫苗都可以同日打', '門診實務');
-  card(s, M, 2.2, CW, 1.85, C.okBg);
-  s.addText('不活化／重組', { x: M + 0.35, y: 2.32, w: 4.0, h: 0.4, fontFace: F, fontSize: 18, bold: true, color: C.ok });
-  s.addText('流感　COVID-19　RSV　Tdap　A 肝　B 肝　帶狀疱疹 Shingrix', {
-    x: M + 0.35, y: 2.78, w: CW - 0.7, h: 1.1, fontFace: F, fontSize: 22, bold: true, color: C.ink, valign: 'top'
+  head(s, '九種疫苗，同一個答案', '門診實務');
+  s.addText('整欄都是「可同日、不需間隔」——因為肺炎鏈球菌疫苗全部都是不活化疫苗', {
+    x: M, y: 1.82, w: CW, h: 0.34, fontFace: F, fontSize: 16, bold: true, color: C.ink2
   });
-  card(s, M, 4.3, CW, 1.5, C.soft);
-  s.addText('活性減毒', { x: M + 0.35, y: 4.42, w: 4.0, h: 0.4, fontFace: F, fontSize: 18, bold: true, color: C.deep });
-  s.addText('MMR　水痘　（免疫功能不全者禁用）', {
-    x: M + 0.35, y: 4.85, w: CW - 0.7, h: 0.8, fontFace: F, fontSize: 22, bold: true, color: C.ink, valign: 'top'
-  });
-  foot(s, 'CDC Yellow Book 2026｜SHINGRIX coadministration（GSK）｜非疾管署公告內容｜查詢日 2026-08-07');
-  note(s, 'Shingrix 不是活性疫苗，這點常被搞錯。');
+  const yes = t => td(t, { bold: true, color: C.ok, align: 'center' });
+  const CO = [
+    ['流感', '不活化', '長年併用，最常見組合'],
+    ['COVID-19', '不活化', '可與幾乎所有疫苗同時接種'],
+    ['RSV', '不活化', '⚠ 併打時 RSV 與流感效價略低，不構成禁忌'],
+    ['Tdap', '不活化', '與 RZV 併用研究無免疫干擾'],
+    ['A 型肝炎', '不活化', '不同部位、不同針筒'],
+    ['B 型肝炎', '不活化', '不同部位、不同針筒'],
+    ['帶狀疱疹 Shingrix', '重組佐劑', '不是活性疫苗，常被搞錯'],
+    ['MMR', '活性減毒', '⚠ 免疫功能不全者禁用（與肺鏈無關）'],
+    ['水痘', '活性減毒', '⚠ 免疫功能不全者禁用（與肺鏈無關）']
+  ];
+  const rows = [[th('疫苗'), th('類型'), th('與肺鏈同日'), th('需要間隔'), th('備註')]].concat(
+    CO.map(r => [
+      td(r[0], { bold: true }), td(r[1], { color: C.ink2 }),
+      yes('✔ 可'), td('不需', { align: 'center', color: C.ink2 }), td(r[2])
+    ])
+  );
+  table(s, M, 2.22, CW, rows, [2.5, 1.5, 1.5, 1.2, CW - 6.7], 14, CONTENT_BOTTOM - 2.22);
+  foot(s, 'CDC Yellow Book 2026（出版日 2025-04-23）｜SHINGRIX coadministration（GSK）｜非疾管署公告內容｜查詢日 2026-08-07');
+  note(s, '重點是「整欄一樣」——不要一列一列念。只要指出兩件事：Shingrix 不是活性疫苗；'
+    + 'MMR／水痘的禁忌是針對免疫功能不全者本身，跟肺鏈同日與否無關。三個真正的例外在下一頁。');
 }
 
 {
@@ -1117,7 +1456,13 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
 /* ─────────── 輸出 ─────────── */
 const OUT_DIR = path.join(__dirname, '..', 'output');
 const OUT = process.env.DECK_OUT || path.join(OUT_DIR, '台灣成人肺炎鏈球菌疫苗簡報.pptx');
-const FALLBACK = path.join(OUT_DIR, '台灣成人肺炎鏈球菌疫苗簡報_新版.pptx');
+/* 備援檔名帶時間戳。
+   （曾叫「_新版」，結果那個檔停在舊版本卻頂著「新版」的名字，反過來誤導。） */
+function stamp() {
+  const d = new Date(), p = x => String(x).padStart(2, '0');
+  return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes());
+}
+const FALLBACK = path.join(OUT_DIR, '台灣成人肺炎鏈球菌疫苗簡報_備援_' + stamp() + '.pptx');
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 pres.writeFile({ fileName: OUT })
