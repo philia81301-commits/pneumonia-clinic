@@ -37,10 +37,15 @@
     return null;
   }
 
-  /** 是否適用 8 週短間隔 */
+  /**
+   * 是否適用 8 週短間隔
+   * 公告逐字：「『IPD高風險對象』、65歲以上『機構住民』及『洗腎患者』接種PCV13/15
+   * 間隔至少8週後可接種PCV20或PCV21」——三種身分並列，「65 歲以上」只修飾後兩者，
+   * 因此 IPD 高風險對象不分年齡皆適用（65 歲以上的高風險者亦然）。
+   */
   function hasShortInterval(ctx) {
     const { age, fundedRisk, isInstitutional, isDialysis } = ctx;
-    if (age >= 19 && age <= 64 && fundedRisk.length > 0) return true;
+    if (fundedRisk.length > 0) return true;
     if (age >= 65 && (isInstitutional || isDialysis)) return true;
     return false;
   }
@@ -126,6 +131,10 @@
     if (interval.boosterNA) {
       out.push({ id: 'boosterNotApplicable', level: 'info', text: W.boosterNotApplicable.text });
     }
+    if (interval.usedShort) {
+      const reg = RULES.shortIntervalEligibility.registrationCode;
+      out.push({ id: 'registrationCode', level: 'info', text: reg.text });
+    }
     out.push({ id: 'coadmin', level: 'info', text: W.coadmin.text });
     return out;
   }
@@ -165,7 +174,7 @@
    * @param {number} input.birthYear      西元出生年
    * @param {number} [input.currentYear]  預設為今年
    * @param {boolean} [input.isIndigenous]
-   * @param {string[]} [input.fundedRisk]   公費 6 類適應症 id
+   * @param {string[]} [input.fundedRisk]   公費 5 項適應症 id
    * @param {string[]} [input.clinicalRisk] 臨床高風險（非公費）適應症 id
    * @param {string} input.history          接種史 id
    * @param {number|null} [input.monthsSinceLast] 距上次接種月數
@@ -234,7 +243,7 @@
         selfPayReason: fundedCategory
           ? null
           : ctx.age >= 19 && ctx.age <= 64
-            ? '19–64 歲僅限 6 類 IPD 高風險對象具公費資格，其餘（含糖尿病、COPD、慢性肝腎疾病、吸菸等）需自費。'
+            ? '19–64 歲僅限公告列舉的 5 項 IPD 高風險對象具公費資格，其餘（含糖尿病、COPD、慢性肝腎疾病、吸菸等）需自費。'
             : '未達公費年齡條件。'
       },
       recommendation: {

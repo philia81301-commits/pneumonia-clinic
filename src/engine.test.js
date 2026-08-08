@@ -128,6 +128,12 @@ const scenarios = [
     expect: { funded: true, action: 'vaccinate', payment: '公費' }
   },
   {
+    name: '⑥b 70 歲 IPD 高風險（脾臟功能缺損）、打過 PCV13 距今 3 個月',
+    note: '公告的 8 週但書中「IPD 高風險對象」未限年齡，65 歲以上高風險者同樣適用',
+    input: { birthYear: 1956, history: 'pcv13', monthsSinceLast: 3, fundedRisk: ['asplenia'] },
+    expect: { funded: true, action: 'vaccinate', payment: '公費' }
+  },
+  {
     name: '⑦ 70 歲一般長者、打過 PCV13 距今 3 個月（不適用短間隔，須滿 1 年）',
     input: { birthYear: 1956, history: 'pcv13', monthsSinceLast: 3 },
     expect: { funded: true, action: 'wait_interval', payment: '公費', monthsRemaining: 9 }

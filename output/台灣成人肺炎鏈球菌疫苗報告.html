@@ -428,7 +428,8 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
 
       <label>身分別</label>
       <label class="chk"><input type="checkbox" id="indig"> 原住民</label>
-      <label class="chk"><input type="checkbox" id="inst"> 機構住民</label>
+      <label class="chk"><input type="checkbox" id="inst"> <span>機構住民<br>
+        <span style="font-size:12px;color:#4a5b6d" id="instDef"></span></span></label>
       <label class="chk"><input type="checkbox" id="dial"> 洗腎患者</label>
       <label class="chk"><input type="checkbox" id="prior"> <span><b>先前為 19–64 歲 IPD 高風險對象</b><br>
         <span style="font-size:12px;color:#4a5b6d">僅影響「已完整接種兩劑」者能否於滿 65 歲後追加</span></span></label>
@@ -555,9 +556,12 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
 /* ═══ 內嵌規則表（由 build.js 從 src/rules.json 注入，勿手動編輯）═══ */
 var PNEUMO_RULES = {
   "meta": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "updated": "2026-08-08",
     "changelog": [
+      "1.2.0（2026-08-08）★行為變更：8 週短間隔的「IPD 高風險對象」解除 19–64 歲限制（公告逐字為三種身分並列，「65 歲以上」只修飾機構住民與洗腎患者）；新增身分別代碼 R02A 與「機構住民」官方定義",
+      "1.1.2（2026-08-08）新增 ageRule.toolMinAge=19：決策器對未滿 19 歲者不給建議（本專案範圍為成人）；決策器「距上次接種月數」加負值防呆",
+      "1.1.1（2026-08-08）清掉殘留的「6 類」說法：acipComparison.note 與決策器自費說明一律改為「公告列舉的 5 項」，與 fundedRiskConditions 對齊",
       "1.1.0（2026-08-08）依公告原文更正：對象二（三）的 5 年追加規則限『先前為 19–64 歲 IPD 高風險對象』；PCV15＋PPV23 同適用；新增 officialFlow 以公告原文結構呈現",
       "1.0.0（2026-08-07）初版"
     ],
@@ -618,6 +622,8 @@ var PNEUMO_RULES = {
     "countsMonthDay": false,
     "official": "公告逐字：「即以『接種年』減『出生年』計算大於等於 65 歲者」——不計月日。",
     "rocOffset": 1911,
+    "toolMinAge": 19,
+    "toolMinAgeNote": "本專案全部產出以「成人」為範圍；未滿 19 歲不適用本決策器，應依兒童常規預防接種時程辦理。",
     "examples2026": {
       "note": "以民國 115 年（2026）為例",
       "elder65": "50 年次（含）以前出生，即西元 1961 年（含）以前",
@@ -837,11 +843,17 @@ var PNEUMO_RULES = {
     "months": 2,
     "label": "8 週",
     "conditions": [
-      "19–64 歲 IPD 高風險對象",
+      "IPD 高風險對象（不分年齡）",
       "65 歲以上機構住民",
       "65 歲以上洗腎患者"
     ],
-    "test": "(age >= 19 && age <= 64 && fundedRisk.length > 0) || (age >= 65 && (isInstitutional || isDialysis))"
+    "test": "fundedRisk.length > 0 || (age >= 65 && (isInstitutional || isDialysis))",
+    "official": "公告逐字：「『IPD高風險對象』、65歲以上『機構住民』及『洗腎患者』接種PCV13/15間隔至少8週後可接種PCV20或PCV21。」三種身分並列，「65 歲以上」只修飾「機構住民」與「洗腎患者」，IPD 高風險對象不受年齡限制。",
+    "registrationCode": {
+      "code": "R02A",
+      "text": "登錄上述三種對象的接種資料時，請加註身分別代碼「R02A」，俾利系統正確區分統計。"
+    },
+    "institutionalDefinition": "「機構住民」指入住一般護理之家、精神護理之家、精神復健機構、老人福利機構、身心障礙福利機構、住宿式長照機構、榮譽國民之家等機構者。"
   },
   "warnings": {
     "menacwyD": {
@@ -872,7 +884,7 @@ var PNEUMO_RULES = {
   "acipComparison": {
     "startAge": 50,
     "twStartAge": 65,
-    "note": "美國 ACIP 建議 ≥50 歲成人接種，且高風險定義較寬（含糖尿病、慢性心肺肝腎病、吸菸、酒精使用障礙）。台灣公費起始年齡為 65 歲，19–64 歲僅限 6 類 IPD 高風險對象。",
+    "note": "美國 ACIP 建議 ≥50 歲成人接種，且高風險定義較寬（含糖尿病、慢性心肺肝腎病、吸菸、酒精使用障礙）。台灣公費起始年齡為 65 歲，19–64 歲僅限公告列舉的 5 項 IPD 高風險對象。",
     "schedule50plus": {
       "none": {
         "optionA": "PCV20 或 PCV21",
@@ -975,10 +987,15 @@ var PNEUMO_RULES = {
     return null;
   }
 
-  /** 是否適用 8 週短間隔 */
+  /**
+   * 是否適用 8 週短間隔
+   * 公告逐字：「『IPD高風險對象』、65歲以上『機構住民』及『洗腎患者』接種PCV13/15
+   * 間隔至少8週後可接種PCV20或PCV21」——三種身分並列，「65 歲以上」只修飾後兩者，
+   * 因此 IPD 高風險對象不分年齡皆適用（65 歲以上的高風險者亦然）。
+   */
   function hasShortInterval(ctx) {
     const { age, fundedRisk, isInstitutional, isDialysis } = ctx;
-    if (age >= 19 && age <= 64 && fundedRisk.length > 0) return true;
+    if (fundedRisk.length > 0) return true;
     if (age >= 65 && (isInstitutional || isDialysis)) return true;
     return false;
   }
@@ -1064,6 +1081,10 @@ var PNEUMO_RULES = {
     if (interval.boosterNA) {
       out.push({ id: 'boosterNotApplicable', level: 'info', text: W.boosterNotApplicable.text });
     }
+    if (interval.usedShort) {
+      const reg = RULES.shortIntervalEligibility.registrationCode;
+      out.push({ id: 'registrationCode', level: 'info', text: reg.text });
+    }
     out.push({ id: 'coadmin', level: 'info', text: W.coadmin.text });
     return out;
   }
@@ -1103,7 +1124,7 @@ var PNEUMO_RULES = {
    * @param {number} input.birthYear      西元出生年
    * @param {number} [input.currentYear]  預設為今年
    * @param {boolean} [input.isIndigenous]
-   * @param {string[]} [input.fundedRisk]   公費 6 類適應症 id
+   * @param {string[]} [input.fundedRisk]   公費 5 項適應症 id
    * @param {string[]} [input.clinicalRisk] 臨床高風險（非公費）適應症 id
    * @param {string} input.history          接種史 id
    * @param {number|null} [input.monthsSinceLast] 距上次接種月數
@@ -1172,7 +1193,7 @@ var PNEUMO_RULES = {
         selfPayReason: fundedCategory
           ? null
           : ctx.age >= 19 && ctx.age <= 64
-            ? '19–64 歲僅限 6 類 IPD 高風險對象具公費資格，其餘（含糖尿病、COPD、慢性肝腎疾病、吸菸等）需自費。'
+            ? '19–64 歲僅限公告列舉的 5 項 IPD 高風險對象具公費資格，其餘（含糖尿病、COPD、慢性肝腎疾病、吸菸等）需自費。'
             : '未達公費年齡條件。'
       },
       recommendation: {
@@ -1263,6 +1284,7 @@ var PNEUMO_RULES = {
   }
   mkChecks('fr', R.fundedRiskConditions, 'funded');
   mkChecks('cr', R.clinicalRiskConditions, 'clinical');
+  $('instDef').textContent = R.shortIntervalEligibility.institutionalDefinition;
 
   function picked(g){
     return Array.prototype.slice.call(document.querySelectorAll('[data-g="'+g+'"]'))
@@ -1277,13 +1299,21 @@ var PNEUMO_RULES = {
     var age = YEAR - by;
     $('agebox').innerHTML = '目前年齡：<b>' + age + '</b> 歲　<span style="font-size:12px">（' + YEAR + ' − ' + by + '，以年份計、不計月日）</span>';
 
+    // 本工具僅適用成人；未滿 19 歲不給建議，避免把成人方案套到兒童身上
+    if (age < R.ageRule.toolMinAge) {
+      $('out').innerHTML = '<div class="res wait">'
+        + '<div class="hl">本工具不適用於未滿 ' + R.ageRule.toolMinAge + ' 歲者</div>'
+        + '<div>' + R.ageRule.toolMinAgeNote + '</div></div>';
+      return;
+    }
+
     var r = E.decide({
       birthYear: by, currentYear: YEAR,
       isIndigenous: $('indig').checked, isInstitutional: $('inst').checked, isDialysis: $('dial').checked,
       priorHighRisk19to64: $('prior').checked,
       fundedRisk: picked('funded'), clinicalRisk: picked('clinical'),
       history: histSel.value,
-      monthsSinceLast: parseInt($('msl').value, 10) || 0
+      monthsSinceLast: Math.max(0, parseInt($('msl').value, 10) || 0)
     });
 
     var cls = r.recommendation.action === 'vaccinate' ? 'go'

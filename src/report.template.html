@@ -428,7 +428,8 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
 
       <label>身分別</label>
       <label class="chk"><input type="checkbox" id="indig"> 原住民</label>
-      <label class="chk"><input type="checkbox" id="inst"> 機構住民</label>
+      <label class="chk"><input type="checkbox" id="inst"> <span>機構住民<br>
+        <span style="font-size:12px;color:#4a5b6d" id="instDef"></span></span></label>
       <label class="chk"><input type="checkbox" id="dial"> 洗腎患者</label>
       <label class="chk"><input type="checkbox" id="prior"> <span><b>先前為 19–64 歲 IPD 高風險對象</b><br>
         <span style="font-size:12px;color:#4a5b6d">僅影響「已完整接種兩劑」者能否於滿 65 歲後追加</span></span></label>
@@ -624,6 +625,7 @@ var PNEUMO_RULES = /*__RULES_JSON__*/;
   }
   mkChecks('fr', R.fundedRiskConditions, 'funded');
   mkChecks('cr', R.clinicalRiskConditions, 'clinical');
+  $('instDef').textContent = R.shortIntervalEligibility.institutionalDefinition;
 
   function picked(g){
     return Array.prototype.slice.call(document.querySelectorAll('[data-g="'+g+'"]'))
@@ -638,13 +640,21 @@ var PNEUMO_RULES = /*__RULES_JSON__*/;
     var age = YEAR - by;
     $('agebox').innerHTML = '目前年齡：<b>' + age + '</b> 歲　<span style="font-size:12px">（' + YEAR + ' − ' + by + '，以年份計、不計月日）</span>';
 
+    // 本工具僅適用成人；未滿 19 歲不給建議，避免把成人方案套到兒童身上
+    if (age < R.ageRule.toolMinAge) {
+      $('out').innerHTML = '<div class="res wait">'
+        + '<div class="hl">本工具不適用於未滿 ' + R.ageRule.toolMinAge + ' 歲者</div>'
+        + '<div>' + R.ageRule.toolMinAgeNote + '</div></div>';
+      return;
+    }
+
     var r = E.decide({
       birthYear: by, currentYear: YEAR,
       isIndigenous: $('indig').checked, isInstitutional: $('inst').checked, isDialysis: $('dial').checked,
       priorHighRisk19to64: $('prior').checked,
       fundedRisk: picked('funded'), clinicalRisk: picked('clinical'),
       history: histSel.value,
-      monthsSinceLast: parseInt($('msl').value, 10) || 0
+      monthsSinceLast: Math.max(0, parseInt($('msl').value, 10) || 0)
     });
 
     var cls = r.recommendation.action === 'vaccinate' ? 'go'
