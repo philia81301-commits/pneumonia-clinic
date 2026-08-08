@@ -18,10 +18,10 @@
 
 - [x] 階段一：資料查證 —— `data/01`–`07` 七份，全附出處與查詢日
 - [x] 階段二：**單一規則表** `src/rules.json` ＋ 決策引擎 `src/engine.js`（測試 419,378 項零失敗）
-- [x] 階段三：互動式 HTML 報告（單檔 65.7 KB、可離線、含決策器與自動生成流程圖）
-- [x] 階段四：PowerPoint 簡報 **53 張**（含免疫橋接教學模組 7 頁）
+- [x] 階段三：互動式 HTML 報告（單檔 82.9 KB、可離線、含決策器、血清型矩陣、三張內嵌 SVG 圖表）
+- [x] 階段四：PowerPoint 簡報 **56 張**（含免疫橋接教學模組 7 頁、四張新增圖表）
 - [x] 階段五：A4 病人衛教單張 —— **維持雙面兩頁**，兩面各約 234／239mm，可容忍 Letter 紙匣與瀏覽器頁首頁尾
-- [ ] 階段六：三份產出交付前總驗收（依規格卡驗收條件逐條檢查）
+- [x] 階段六：總驗收 —— 11 條驗收條件全過，自動化為 `src/acceptance.py`；2 項規格偏離待使用者確認
 - [ ] 待辦：`.pptx` 複製一份到 OneDrive 備份（依檔案放置約定，不進 git）
 
 ## 資料夾結構
@@ -43,7 +43,8 @@ C:\projects\pneumonia-clinic\
 │   ├── build.js                 # 建置：注入 rules/engine → output（含衛教單張術語檢查）
 │   ├── deck.js                  # 簡報產生器：node src/deck.js
 │   ├── deck_qa.py              # 版面＋出處稽核（無 LibreOffice 環境的替代 QA）
-│   ├── consistency.py           # 跨產出數字一致性與用語紅線掃描
+│   ├── consistency.py           # 跨產出數字一致性、用語紅線、血清型與語意色同源檢查
+│   ├── acceptance.py            # 總驗收：逐條核對 RDQ 規格卡的驗收條件
 │   └── serve.js                 # 本機預覽伺服器（僅開發用）
 └── output\                      # 產出物（*.pptx 不進 git，見下）
 ```

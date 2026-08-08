@@ -1316,24 +1316,33 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     x: M, y: 1.82, w: CW, h: 0.34, fontFace: F, fontSize: 16, bold: true, color: C.ink2
   });
   const yes = t => td(t, { bold: true, color: C.ok, align: 'center' });
-  const CO = [
-    ['流感', '不活化', '長年併用，最常見組合'],
-    ['COVID-19', '不活化', '可與幾乎所有疫苗同時接種'],
-    ['RSV', '不活化', '⚠ 併打時 RSV 與流感效價略低，不構成禁忌'],
-    ['Tdap', '不活化', '與 RZV 併用研究無免疫干擾'],
-    ['A 型肝炎', '不活化', '不同部位、不同針筒'],
-    ['B 型肝炎', '不活化', '不同部位、不同針筒'],
-    ['帶狀疱疹 Shingrix', '重組佐劑', '不是活性疫苗，常被搞錯'],
-    ['MMR', '活性減毒', '⚠ 免疫功能不全者禁用（與肺鏈無關）'],
-    ['水痘', '活性減毒', '⚠ 免疫功能不全者禁用（與肺鏈無關）']
+  // 規格卡要求「不活化與活性減毒分兩區呈現」，用 rowspan 做出分區（與 HTML 報告同一種呈現）
+  const GRP = [
+    { g: '不活化\n／重組', rows: [
+      ['流感', '長年併用，最常見組合'],
+      ['COVID-19', '可與幾乎所有疫苗同時接種'],
+      ['RSV', '⚠ 併打時 RSV 與流感效價略低，不構成禁忌'],
+      ['Tdap', '與 RZV 併用研究無免疫干擾'],
+      ['A 型肝炎', '不同部位、不同針筒'],
+      ['B 型肝炎', '不同部位、不同針筒'],
+      ['帶狀疱疹 Shingrix', '重組佐劑型，不是活性疫苗，常被搞錯']
+    ] },
+    { g: '活性\n減毒', rows: [
+      ['MMR', '⚠ 免疫功能不全者禁用（與肺鏈同日無關）'],
+      ['水痘', '⚠ 免疫功能不全者禁用（與肺鏈同日無關）']
+    ] }
   ];
-  const rows = [[th('疫苗'), th('類型'), th('與肺鏈同日'), th('需要間隔'), th('備註')]].concat(
-    CO.map(r => [
-      td(r[0], { bold: true }), td(r[1], { color: C.ink2 }),
-      yes('✔ 可'), td('不需', { align: 'center', color: C.ink2 }), td(r[2])
-    ])
-  );
-  table(s, M, 2.22, CW, rows, [2.5, 1.5, 1.5, 1.2, CW - 6.7], 14, CONTENT_BOTTOM - 2.22);
+  const rows = [[th('分類'), th('疫苗'), th('與肺鏈同日'), th('間隔'), th('備註')]];
+  GRP.forEach(grp => {
+    grp.rows.forEach((r, i) => {
+      const line = [];
+      if (i === 0) line.push(td(grp.g, { rowspan: grp.rows.length, bold: true, color: C.deep, valign: 'middle' }));
+      line.push(td(r[0], { bold: true }), yes('✔ 可'),
+                td('不需', { align: 'center', color: C.ink2 }), td(r[1]));
+      rows.push(line);
+    });
+  });
+  table(s, M, 2.22, CW, rows, [1.35, 2.45, 1.5, 1.2, CW - 6.5], 14, CONTENT_BOTTOM - 2.22);
   foot(s, 'CDC Yellow Book 2026（出版日 2025-04-23）｜SHINGRIX coadministration（GSK）｜非疾管署公告內容｜查詢日 2026-08-07');
   note(s, '重點是「整欄一樣」——不要一列一列念。只要指出兩件事：Shingrix 不是活性疫苗；'
     + 'MMR／水痘的禁忌是針對免疫功能不全者本身，跟肺鏈同日與否無關。三個真正的例外在下一頁。');

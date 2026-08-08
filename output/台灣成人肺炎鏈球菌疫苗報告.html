@@ -66,6 +66,30 @@
   .mx tr[data-v="PCV20"] .dot.on{background:var(--pcv20)}
   .mx tr[data-v="PCV21"] .dot.on{background:var(--pcv21)}
   .mx td.hl .dot.on{outline:2px solid #d97706;outline-offset:1px}
+  /* 圖表：純 SVG、無外部相依 */
+  /* 圖內文字是固定字級，viewBox 縮太小就看不清楚；
+     窄螢幕改成保留最小寬度、橫向捲動，與寬表格的處理一致 */
+  figure.chart{margin:14px 0 6px;padding:0}
+  figure.chart>div{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  figure.chart svg{display:block;width:100%;min-width:560px;height:auto}
+  figure.chart figcaption{font-size:12px;color:var(--ink2);margin-top:4px}
+  .chart .gl{stroke:var(--line);stroke-width:1}
+  .chart .ax{fill:var(--ink2);font-size:13px}
+  .chart .vl{fill:var(--ink);font-size:14px;font-weight:700}
+  .chart .lg{fill:var(--ink2);font-size:13px}
+  .chart .bar{fill:var(--accent)}
+  .chart .lin{fill:none;stroke:var(--warn);stroke-width:3}
+  .chart .pt{fill:var(--warn)}
+  .chart .dv{fill:var(--warn);font-size:12px;font-weight:700}
+  .chart .cap{fill:var(--pcv13)}
+  .chart .ci{stroke:var(--ink2);stroke-width:2}
+  .chart .box{fill:var(--accent-l)}
+  .chart .tl{fill:var(--ink2);font-size:13px}
+  .chart .tk{fill:var(--accent);font-size:18px;font-weight:800}
+  .chart .chip{font-size:12px;font-weight:700;fill:#fff}
+  .chart .v-PPV23{fill:var(--ppv23)} .chart .v-PCV13{fill:var(--pcv13)}
+  .chart .v-PCV15{fill:var(--pcv15)} .chart .v-PCV20{fill:var(--pcv20)}
+  .chart .v-PCV21{fill:var(--pcv21)}
   .mx col.dim,.mx td.dim{opacity:.22}
   .btns{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
   button{font:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--line);background:#fff;
@@ -161,12 +185,20 @@
   <div><div class="v">約 12%</div><div class="l">2024 年完整接種<br>（PCV13/15＋PPV23 兩劑）比率</div></div>
   <div><div class="v">347 例</div><div class="l">2025 年 IPD 確定病例<br>（死亡 36 例）</div></div>
 </div>
-<p class="src">來源：林冠吟。〈肺炎鏈球菌疫苗與呼吸道融合病毒疫苗〉。<b>內科學誌 2025;36(6):381-386</b>，DOI: 10.6314/JIMT.202512_36(6).04（查詢日 2026-08-07）；病例數為疾管署法定傳染病統計。</p>
+<p class="src">來源：林冠吟。〈肺炎鏈球菌疫苗與呼吸道融合病毒疫苗〉。<b>內科學誌 2025;36(6):381-386</b>，DOI: 10.6314/JIMT.202512_36(6).04
+<a href="https://www.tsim.org.tw/ehc-tsim/s/viewFile?documentId=8108267ec5b3450bb1ac8db3193e1316" target="_blank" rel="noopener">全文 PDF</a>（查詢日 2026-08-07）；病例數為疾管署
+<a href="https://nidss.cdc.gov.tw/" target="_blank" rel="noopener">法定傳染病統計</a>。</p>
 
 <div class="note warn">
   <p><b>引用注意</b>：疾管署另有「完成率 36%」的說法，與本文的「完整接種 12%」定義不同（前者為曾接種、後者為完整兩劑）。
   兩個數字<b>不可混用</b>，引用時務必標明定義。</p>
 </div>
+
+<h3>IPD 確定病例與死亡數（2021–2025）</h3>
+<figure class="chart"><div id="ch-ipd"></div>
+<figcaption>五年病例數近倍增（196 → 347），同期死亡數自 2023 年起持平在 36–39 例。
+這是法定傳染病通報資料，非校正過的族群研究，不可解讀為「疫苗使死亡下降」。
+來源：疾管署法定傳染病統計，查詢日 2026-08-07。</figcaption></figure>
 
 <h3>血清型置換：這是理解 PCV21 的關鍵</h3>
 <div class="scroll">
@@ -297,6 +329,11 @@ LDL 降得多是事實，但降多少 LDL 換到多少心肌梗塞減少，是�
 <h2 id="s4"><span class="num">04</span>效力證據等級</h2>
 <p class="lead">只有 PPV23 與 PCV13 有臨床終點證據；PCV15、PCV20、PCV21 全部以免疫橋接核准。</p>
 
+<figure class="chart"><div id="ch-tier"></div>
+<figcaption><b>階梯高度代表「距離臨床終點的遠近」，不代表保護力高低。</b>
+四支之間沒有頭對頭療效試驗可以比優劣；新疫苗不做臨床終點試驗，是因為已有有效疫苗可用，
+再做安慰劑對照並不合倫理。</figcaption></figure>
+
 <div class="scroll">
 <table>
   <thead><tr><th>疫苗</th><th>證據類型</th><th>說明</th></tr></thead>
@@ -316,6 +353,9 @@ LDL 降得多是事實，但降多少 LDL 換到多少心肌梗塞減少，是�
 
 <h3>CAPiTA：唯一的成人臨床終點試驗</h3>
 <p>收案 <b>84,496</b> 人（PCV13 組 n=42,240／安慰劑組 n=42,256），平均追蹤約 <b>4 年</b>。</p>
+<figure class="chart"><div id="ch-capita"></div>
+<figcaption>橫線為信賴區間。<b>前兩個終點是 95.2% CI 而非 95%</b>（期中分析 alpha 消耗），引用時照抄。
+來源：Bonten MJM, et al. <i>N Engl J Med</i> 2015;372:1114-25（PMID 26076136），查詢日 2026-08-07。</figcaption></figure>
 <div class="scroll">
 <table>
   <thead><tr><th>終點</th><th>疫苗效力 VE</th><th>信賴區間</th><th>P 值</th></tr></thead>
@@ -402,6 +442,56 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
   <p>文獻支持主動評估自費接種：具 <b>2 個以上共病症</b>者，其肺炎風險與高風險患者相當或甚至更高。
   （Pelton SI, et al. <i>BMC Infect Dis</i> 2015;15:470）</p>
 </div>
+
+<h3>逐類適應症速查：打哪一支、要不要序貫、有沒有公費</h3>
+<p>新制之下<b>建議疫苗與序貫與否對所有適應症都相同</b>——PCV20 或 PCV21 擇一、接種 1 劑、不需序貫。
+逐類的差別只在<b>公費資格</b>，且 65 歲以上一律因年齡取得公費。</p>
+<div class="scroll">
+<table id="hrtab">
+  <thead><tr><th>適應症</th><th>建議疫苗</th><th>是否需序貫</th><th>19–64 歲</th><th>≥65 歲</th><th>依據與備註</th></tr></thead>
+  <tbody>
+    <tr><td colspan="6" style="background:var(--accent-l);font-weight:700;color:var(--accent)">第一層｜公告列名之 IPD 高風險（19–64 歲即具公費資格）</td></tr>
+    <tr><td><b>無脾症或脾臟功能缺損</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag ok">公費</span></td><td><span class="tag ok">公費</span></td><td>公告第 1 項</td></tr>
+    <tr><td><b>鐮刀型貧血</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag warn">依認定</span></td><td><span class="tag ok">公費</span></td>
+        <td>因造成<b>功能性無脾</b>，臨床上歸入「脾臟功能缺損」；公告未逐字列名，<b>實際公費資格以合約院所依公告認定為準</b></td></tr>
+    <tr><td><b>免疫功能不全</b>（先天或後天，含 HIV 感染、原發性／繼發性免疫缺陷）</td>
+        <td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag ok">公費</span></td><td><span class="tag ok">公費</span></td><td>公告第 2 項</td></tr>
+    <tr><td><b>人工電子耳植入</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag ok">公費</span></td><td><span class="tag ok">公費</span></td><td>公告第 3 項</td></tr>
+    <tr><td><b>腦脊髓液滲漏</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag ok">公費</span></td><td><span class="tag ok">公費</span></td><td>公告第 4 項</td></tr>
+    <tr><td><b>惡性腫瘤（血液惡性疾病、實體癌）或器官移植</b>，且<b>一年內</b>接受免疫抑制劑或放射治療</td>
+        <td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag ok">公費</span></td><td><span class="tag ok">公費</span></td>
+        <td>公告第 5 項。<b>「一年內」是硬條件</b>；超過一年未接受上述治療者不符第 5 項</td></tr>
+    <tr><td colspan="6" style="background:var(--warn-l);font-weight:700;color:var(--warn)">第二層｜臨床高風險但未列入公費（65 歲前需自費）</td></tr>
+    <tr><td><b>糖尿病</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+    <tr><td><b>慢性心臟病</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+    <tr><td><b>慢性肺病／COPD</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+    <tr><td><b>氣喘</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+    <tr><td><b>慢性肝病與肝硬化</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+    <tr><td><b>慢性腎病與腎病症候群</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td>
+        <td>非公告 5 項之列。但<b>65 歲以上洗腎患者</b>若曾接種 PCV13/15，銜接間隔可縮短為 <b>8 週</b></td></tr>
+    <tr><td><b>酒精使用障礙</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+    <tr><td><b>吸菸者</b></td><td>PCV20 或 PCV21，1 劑</td><td>不需序貫</td>
+        <td><span class="tag bad">自費</span></td><td><span class="tag ok">公費</span></td><td>非公告 5 項之列</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="src">公費資格依據：衛生福利部疾病管制署《成人肺炎鏈球菌疫苗接種須知（自 115 年 8 月 10 日起適用）》參、實施對象；
+<a href="https://www.cdc.gov.tw/Bulletin/Detail/314drgt9vg05Js-q1Wgdrw?typeid=48" target="_blank" rel="noopener">致醫界通函第 612 號</a>（查詢日 2026-08-08）。
+第二層的臨床風險依據：Pelton SI, et al. <i>BMC Infect Dis</i> 2015;15:470。
+<b>本表僅整理公費資格條件，不含自費價格</b>；個別病人的資格認定以合約院所為準，本表不取代臨床判斷。</p>
 
 <h3>台美差異速查</h3>
 <div class="scroll">
@@ -1267,6 +1357,104 @@ var PNEUMO_RULES = {
     html += '</tr>';
   });
   mx.innerHTML = html + '</tbody>';
+
+  /* ── 圖表：純 SVG，無外部相依 ──
+     數值與簡報 src/deck.js 同源（data/03、data/05）。改任一處都要同步，
+     consistency.py 會比對 HTML 與 PPTX 的關鍵數字。 */
+  function svg(id, w, h, label, body) {
+    var t = document.getElementById(id);
+    if (t) t.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + label + '">'
+      + '<title>' + label + '</title>' + body + '</svg>';
+  }
+
+  /* 1. IPD 確定病例（柱）＋ 死亡數（線），2021–2025 */
+  (function () {
+    var yr = ['2021', '2022', '2023', '2024', '2025'],
+        ca = [196, 200, 287, 315, 347],
+        de = [19, 20, 39, 36, 36],
+        // B 留 86：死亡數的標籤在點的下方，數值小時會逼近年份軸，需要多留一段
+        W = 720, H = 330, L = 54, R = 16, T = 22, B = 86,
+        pw = W - L - R, ph = H - T - B, MAX = 400,
+        Y = function (v) { return T + ph - (v / MAX) * ph; },
+        X = function (i) { return L + pw * (i + 0.5) / yr.length; },
+        bw = (pw / yr.length) * 0.46, s = '';
+    [0, 100, 200, 300, 400].forEach(function (g) {
+      s += '<line class="gl" x1="' + L + '" y1="' + Y(g) + '" x2="' + (W - R) + '" y2="' + Y(g) + '"/>'
+         + '<text class="ax" x="' + (L - 9) + '" y="' + (Y(g) + 4) + '" text-anchor="end">' + g + '</text>';
+    });
+    yr.forEach(function (y0, i) {
+      s += '<rect class="bar" x="' + (X(i) - bw / 2) + '" y="' + Y(ca[i]) + '" width="' + bw
+         + '" height="' + (Y(0) - Y(ca[i])) + '" rx="2"/>'
+         + '<text class="vl" x="' + X(i) + '" y="' + (Y(ca[i]) - 8) + '" text-anchor="middle">' + ca[i] + '</text>'
+         + '<text class="ax" x="' + X(i) + '" y="' + (Y(0) + 40) + '" text-anchor="middle">' + y0 + '</text>';
+    });
+    s += '<polyline class="lin" points="' + de.map(function (d, i) { return X(i) + ',' + Y(d); }).join(' ') + '"/>';
+    de.forEach(function (d, i) {
+      s += '<circle class="pt" cx="' + X(i) + '" cy="' + Y(d) + '" r="5"/>'
+         + '<text class="dv" x="' + X(i) + '" y="' + (Y(d) + 22) + '" text-anchor="middle">' + d + '</text>';
+    });
+    s += '<rect class="bar" x="' + L + '" y="' + (H - 26) + '" width="16" height="12" rx="2"/>'
+       + '<text class="lg" x="' + (L + 23) + '" y="' + (H - 16) + '">確定病例數</text>'
+       + '<line class="lin" x1="' + (L + 118) + '" y1="' + (H - 20) + '" x2="' + (L + 146) + '" y2="' + (H - 20) + '"/>'
+       + '<circle class="pt" cx="' + (L + 132) + '" cy="' + (H - 20) + '" r="5"/>'
+       + '<text class="lg" x="' + (L + 153) + '" y="' + (H - 16) + '">死亡數</text>';
+    svg('ch-ipd', W, H, '台灣 IPD 確定病例數與死亡數，2021 至 2025 年', s);
+  })();
+
+  /* 2. CAPiTA 三個終點的疫苗效力與信賴區間 */
+  (function () {
+    var D = [
+      { lab: 'VT-CAP（主要終點）', ve: 45.56, lo: 21.82, hi: 62.49 },
+      { lab: '非菌血性 VT-CAP', ve: 45.00, lo: 14.21, hi: 65.31 },
+      { lab: 'VT-IPD', ve: 75.00, lo: 41.43, hi: 90.78 }
+    ];
+    var W = 720, H = 250, L = 168, R = 58, T = 16, B = 46,
+        pw = W - L - R, rh = (H - T - B) / D.length, bh = 26,
+        X = function (v) { return L + (v / 100) * pw; }, s = '';
+    [0, 25, 50, 75, 100].forEach(function (g) {
+      s += '<line class="gl" x1="' + X(g) + '" y1="' + T + '" x2="' + X(g) + '" y2="' + (H - B) + '"/>'
+         + '<text class="ax" x="' + X(g) + '" y="' + (H - B + 20) + '" text-anchor="middle">' + g + '%</text>';
+    });
+    D.forEach(function (d, i) {
+      var cy = T + rh * i + rh / 2;
+      s += '<text class="ax" x="' + (L - 12) + '" y="' + (cy + 5) + '" text-anchor="end">' + d.lab + '</text>'
+         + '<rect class="cap" x="' + L + '" y="' + (cy - bh / 2) + '" width="' + (X(d.ve) - L)
+         + '" height="' + bh + '" rx="2"/>'
+         + '<line class="ci" x1="' + X(d.lo) + '" y1="' + cy + '" x2="' + X(d.hi) + '" y2="' + cy + '"/>'
+         + '<line class="ci" x1="' + X(d.lo) + '" y1="' + (cy - 7) + '" x2="' + X(d.lo) + '" y2="' + (cy + 7) + '"/>'
+         + '<line class="ci" x1="' + X(d.hi) + '" y1="' + (cy - 7) + '" x2="' + X(d.hi) + '" y2="' + (cy + 7) + '"/>'
+         + '<text class="vl" x="' + (X(d.hi) + 8) + '" y="' + (cy + 5) + '">' + d.ve.toFixed(2) + '%</text>';
+    });
+    s += '<text class="lg" x="' + L + '" y="' + (H - 8) + '">疫苗效力 VE（橫線為信賴區間）</text>';
+    svg('ch-capita', W, H, 'CAPiTA 三個終點的疫苗效力與信賴區間', s);
+  })();
+
+  /* 3. 證據的三個層級（階梯高度＝距離臨床終點的遠近，非保護力高低） */
+  (function () {
+    var T3 = [
+      { t: '直接證據', k: '臨床終點 RCT', d: ['隨機分派，以肺炎／IPD', '發病為終點'], v: ['PCV13'], h: 200 },
+      { t: '間接證據', k: '觀察性研究', d: ['有臨床終點，', '但非隨機分派'], v: ['PPV23'], h: 165 },
+      // h 最小 150：要放得下 標籤＋類型＋兩行說明＋色票列，再矮說明就會壓到色票
+      { t: '替代指標', k: '免疫橋接', d: ['比 OPA 效價，', '不是臨床終點'], v: ['PCV15', 'PCV20', 'PCV21'], h: 150 }
+    ];
+    var W = 720, H = 240, BW = 228, GAP = 18, BOT = 214, CHIPY = 168, s = '';
+    T3.forEach(function (t, i) {
+      var x = i * (BW + GAP), y = BOT - t.h, inner = BW - 28;
+      s += '<rect class="box" x="' + x + '" y="' + y + '" width="' + BW + '" height="' + t.h + '" rx="10"/>'
+         + '<text class="tl" x="' + (x + 14) + '" y="' + (y + 24) + '">' + t.t + '</text>'
+         + '<text class="tk" x="' + (x + 14) + '" y="' + (y + 50) + '">' + t.k + '</text>';
+      t.d.forEach(function (ln, j) {
+        s += '<text class="tl" x="' + (x + 14) + '" y="' + (y + 74 + j * 18) + '">' + ln + '</text>';
+      });
+      var cw = Math.min(96, (inner - (t.v.length - 1) * 8) / t.v.length);
+      t.v.forEach(function (vid, j) {
+        var cx = x + 14 + j * (cw + 8);
+        s += '<rect class="v-' + vid + '" x="' + cx + '" y="' + CHIPY + '" width="' + cw + '" height="30" rx="6"/>'
+           + '<text class="chip" x="' + (cx + cw / 2) + '" y="' + (CHIPY + 20) + '" text-anchor="middle">' + vid + '</text>';
+      });
+    });
+    svg('ch-tier', W, H, '疫苗效力證據的三個層級：直接證據、間接證據、替代指標', s);
+  })();
 
   Array.prototype.forEach.call(document.querySelectorAll('[data-hl]'), function(b){
     b.addEventListener('click', function(){
