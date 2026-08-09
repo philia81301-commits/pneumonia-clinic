@@ -208,6 +208,45 @@ sero = re.findall(r'(?<![0-9A-Za-z])(?:6A|6B|9V|9N|10A|11A|12F|14|15A|15B|15C|16
 abbr = set(re.findall(r'\b(?!PCV13|PCV15|PCV20|PCV21|PPV23|COVID|Claude)[A-Z]{2,}(?:-[A-Z0-9]+)?\b', lt))
 (ok if not abbr else warn)('全文無未解釋的英文縮寫', '' if not abbr else '請確認：' + '、'.join(sorted(abbr)))
 
+# ── 12（使用者追加）── 縮寫展開
+print('\n【12】縮寫必須展開：報告首次出現處展開；簡報每一張有該縮寫的都在頁尾標')
+ABBR = {'IPD': '侵襲性肺炎鏈球菌感染症'}
+rtxt = strip_tags(report)
+for k, full in ABBR.items():
+    i = rtxt.find(k)
+    if i < 0:
+        ok('報告未使用 %s' % k)
+    else:
+        head_txt = rtxt[i:i + 60]
+        (ok if full in head_txt else bad)('報告首次出現 %s 即展開為「%s」' % (k, full),
+                                          '' if full in head_txt else '首次出現處：' + re.sub(r'\s+', ' ', head_txt[:40]))
+
+import zipfile as _zf
+_z = _zf.ZipFile(DECK)
+_slides = sorted((n for n in _z.namelist() if re.match(r'ppt/slides/slide\d+\.xml$', n)),
+                 key=lambda p: int(re.search(r'slide(\d+)', p).group(1)))
+for k, full in ABBR.items():
+    lack = []
+    used = []
+    for p in _slides:
+        t = ' '.join(re.findall(r'<a:t>(.*?)</a:t>', _z.read(p).decode('utf-8'), re.S))
+        if k not in t:
+            continue
+        no = int(re.search(r'slide(\d+)', p).group(1))
+        used.append(no)
+        if full not in t:
+            lack.append(no)
+    if not used:
+        ok('簡報未使用 %s' % k)
+    elif lack:
+        bad('簡報有 %s 卻未標展開的投影片：%s' % (k, lack))
+    else:
+        ok('簡報 %d 張含 %s，每一張都標了展開' % (len(used), k), 'S' + '、S'.join(map(str, used)))
+
+lt_abbr = [k for k in ABBR if k in strip_tags(leaflet)]
+(ok if not lt_abbr else warn)('衛教單張未使用這些縮寫（本就應全白話）',
+                              '' if not lt_abbr else '出現：' + '、'.join(lt_abbr))
+
 # ── 規格偏離 ──
 print('\n【規格偏離：需使用者確認】')
 warn('衛教單張由「A4 單頁」改為「A4 雙面兩頁」',

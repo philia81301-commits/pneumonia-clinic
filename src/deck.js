@@ -60,10 +60,29 @@ const notes = [];
 
 /* ─────────── 版面元件 ─────────── */
 
+/* 縮寫展開：投影片常被單張抽出來用，聽眾也可能中途進場，
+   所以「只在首次出現展開」不夠 —— 有出現該縮寫的每一張都要在頁尾標。
+   下面用自動偵測，不靠人記得加；要新增縮寫只要往 ABBR 加一行。 */
+const ABBR = {
+  IPD: 'IPD ＝ 侵襲性肺炎鏈球菌感染症'
+};
+
 function slide(opts) {
   opts = opts || {};
   const s = pres.addSlide();
   s.background = { color: opts.dark ? C.deep : C.bg };
+  // 累積本張的所有文字，供 foot() 判斷要標哪些縮寫
+  s.__txt = '';
+  const _addText = s.addText.bind(s);
+  s.addText = function (t, o) {
+    s.__txt += typeof t === 'string' ? t : JSON.stringify(t);
+    return _addText(t, o);
+  };
+  const _addTable = s.addTable.bind(s);
+  s.addTable = function (rows, o) {
+    s.__txt += JSON.stringify(rows);
+    return _addTable(rows, o);
+  };
   n++;
   return s;
 }
@@ -84,8 +103,14 @@ function head(s, title, kicker) {
 
 /** 頁碼與出處 */
 function foot(s, src) {
-  if (src) {
-    s.addText(src, {
+  // 縮寫併進出處行。不另起一行是因為版面下緣常被 callout 佔住，
+  // 另起一行會撞到內容（實測 S3／S37／S38／S45 都會）。
+  const abbr = Object.keys(ABBR)
+    .filter(k => (s.__txt || '').indexOf(k) >= 0)
+    .map(k => ABBR[k]).join('　');
+  const line = [abbr, src].filter(Boolean).join('　｜　');
+  if (line) {
+    s.addText(line, {
       x: M, y: H - 0.62, w: CW - 0.8, h: 0.34, fontFace: F, fontSize: 11,
       color: C.ink2, valign: 'middle'
     });
@@ -231,7 +256,8 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     [th('類別'), th('條件')],
     [td('長者'), td('65 歲（含）以上', { bold: true, color: C.deep })],
     [td('原住民'), td('55–64 歲', { bold: true, color: C.deep })],
-    [td('IPD 高風險'), td('19–64 歲，且符合公告列舉的 5 項之一：\n① 脾臟功能缺損　② 先天或後天免疫功能不全　③ 人工耳植入\n④ 腦脊髓液滲漏　⑤「一年內」接受免疫抑制劑或放射治療的惡性腫瘤者及器官移植者', { bold: true, color: C.deep })]
+    // 全場第一次出現 IPD，在此展開全名（之後每一張有 IPD 的投影片由 foot() 自動在頁尾標）
+    [td('IPD 高風險\n（侵襲性肺炎鏈球菌感染症）'), td('19–64 歲，且符合公告列舉的 5 項之一：\n① 脾臟功能缺損　② 先天或後天免疫功能不全　③ 人工耳植入\n④ 腦脊髓液滲漏　⑤「一年內」接受免疫抑制劑或放射治療的惡性腫瘤者及器官移植者', { bold: true, color: C.deep })]
   ];
   table(s, M, 2.1, CW, rows, [2.9, CW - 2.9], 18, [0.62, 0.62, 0.62, 1.62]);
   callout(s, M, 5.75, CW, 1.2,
