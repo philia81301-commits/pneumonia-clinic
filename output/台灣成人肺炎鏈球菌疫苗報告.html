@@ -47,6 +47,8 @@
   th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
   th{background:#eef3f7;font-weight:700;white-space:nowrap}
   tbody tr:nth-child(even){background:#fbfcfd}
+  table.mini{font-size:14px;margin:10px 0}
+  table.mini th,table.mini td{padding:6px 9px}
   .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:18px 0}
   .kpi>div{background:#fff;border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:8px;padding:14px 16px}
   .kpi .v{font-size:27px;font-weight:800;color:var(--accent);line-height:1.2}
@@ -193,8 +195,16 @@ CAPiTA 對「疫苗血清型肺炎」的效力是 45.56%，對「疫苗血清型
 <a href="https://nidss.cdc.gov.tw/" target="_blank" rel="noopener">法定傳染病統計</a>。</p>
 
 <div class="note warn">
-  <p><b>引用注意</b>：疾管署另有「完成率 36%」的說法，與本文的「完整接種 12%」定義不同（前者為曾接種、後者為完整兩劑）。
-  兩個數字<b>不可混用</b>，引用時務必標明定義。</p>
+  <p><b>引用注意</b>：疾管署另公布一組數字——<b>65 歲以上長者接種完成率由政策實施前的 31% 提升至 36%</b>
+  （<a href="https://www.cdc.gov.tw/Bulletin/Detail/vwMq9VkXIaV7FHyJgpk-5w?typeid=9" target="_blank" rel="noopener">疾管署新聞稿 2026-07-28</a>，查詢日 2026-08-09）。
+  它與上方的「12%」<b>不是同一個指標</b>：</p>
+  <div class="scroll"><table class="mini">
+    <tr><th>數字</th><th>年份</th><th>母體</th><th>指標定義</th></tr>
+    <tr><td><b>約 12%</b></td><td>2024</td><td>成人公費對象</td><td>舊制完整接種＝ PCV13/15 ＋ PPV23 <b>兩劑都打完</b></td></tr>
+    <tr><td><b>31% → 36%</b></td><td>2026-01 前 → 2026-07</td><td><b>65 歲以上長者</b></td><td>接種<b>完成率</b>（新制打 1 劑即計為完成）</td></tr>
+  </table></div>
+  <p>三個數字年份、母體、完成定義全都不同，<b>不可混用</b>。
+  ⛔ 特別不要寫成「完成率從 12% 提升到 36%」——那是把三個不同定義串成一條不存在的趨勢線。</p>
 </div>
 
 <h3>IPD 確定病例與死亡數（2021–2025）</h3>
@@ -569,7 +579,8 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
     <tr><td>A 型肝炎疫苗</td><td><span class="tag ok">可</span></td><td>不同部位、不同針筒</td></tr>
     <tr><td>B 型肝炎疫苗</td><td><span class="tag ok">可</span></td><td>不同部位、不同針筒</td></tr>
     <tr><td><b>帶狀疱疹 Shingrix（RZV）</b></td><td><span class="tag ok">可</span></td>
-        <td><b>重組佐劑型，不是活性疫苗</b>。與流感、PPSV23、Tdap、PCV13 併用研究無免疫干擾</td></tr>
+        <td><b>重組佐劑型，不是活性疫苗</b>。與流感、PPSV23、Tdap、PCV13 併用研究無免疫干擾。
+        台灣<b>已無活性減毒型帶狀疱疹疫苗</b>（Zostavax 於 2025-10-07 自請註銷），現行僅此一種</td></tr>
     <tr><td rowspan="2">活性<br>減毒</td><td>MMR</td><td><span class="tag ok">可</span></td><td>免疫功能不全者禁用</td></tr>
     <tr><td>水痘疫苗</td><td><span class="tag ok">可</span></td><td>免疫功能不全者禁用</td></tr>
   </tbody>
@@ -590,7 +601,10 @@ DOI: 10.1016/S1473-3099(24)00344-X　<b>PMID 38964361</b>（查詢日 2026-08-07
   <li><b>無脾症／脾臟功能缺損或 HIV 感染者：PCV13 與 MenACWY-D（Menactra 廠牌）不可同時接種。</b>
       只針對 Menactra，MenACWY-CRM（Menveo）無此限制。機轉為 Menactra 干擾 PCV13 抗體反應。
       正確順序：先打 PCV13，至少 4 週後再打 Menactra。
-      <span class="tag warn">待確認</span> 此限制是否延伸至 PCV20／PCV21。</li>
+      <br><b>台灣現況（2026-08-09 查證）</b>：食藥署藥證資料<b>查無 Menactra</b>；
+      台灣現行的四價流腦結合型疫苗是 <b>Menveo（腦寧安，MenACWY-CRM，衛部菌疫輸字第000968號）</b>，
+      <b>不受此限制</b>。因此本條在台灣<b>只適用於有國外 Menactra 接種史的病人</b>。
+      另查無任何官方文件將此限制延伸至 PCV20／PCV21，原始敘述僅針對 PCV13，不得自行推論。</li>
   <li><b>PCV15 與 PPV23 不可於同一次就診接種。</b></li>
   <li>RSV 疫苗併打時效價略低，可考慮分開接種，但不構成禁忌。</li>
 </ol>

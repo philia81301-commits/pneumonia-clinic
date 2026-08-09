@@ -314,9 +314,11 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
     x: 6.9, y: 2.35, w: CW - 6.5, h: 2.4, fontFace: F, fontSize: 28, bold: true,
     color: C.warn, valign: 'middle'
   });
-  callout(s, M, 4.95, CW, 0.8, '疾管署另有「36%」的說法，定義為曾接種而非完整兩劑，兩者不可混用', 'warn');
-  foot(s, '內科學誌 2025;36(6):381-386｜查詢日 2026-08-07');
-  note(s, '12% 與 36% 定義不同，被問到時要能立刻分辨。');
+  callout(s, M, 4.95, CW, 0.8, '疾管署另公布 31%→36%：母體是 65 歲以上長者的「接種完成率」，與本頁定義不同', 'warn');
+  foot(s, '內科學誌 2025;36(6):381-386｜疾管署新聞稿 2026-07-28｜查詢日 2026-08-07、2026-08-09');
+  note(s, '被問到 36% 時要能立刻分辨：本頁 12% 是 2024 年全成人、舊制兩劑都打完；'
+       + '疾管署的 31%→36% 是 65 歲以上長者的接種完成率，而且新制打 1 劑就算完成。'
+       + '不要講成「從 12% 提升到 36%」，那是三個不同定義串成的假趨勢。');
 }
 
 {
@@ -1371,7 +1373,9 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   table(s, M, 2.22, CW, rows, [1.35, 2.45, 1.5, 1.2, CW - 6.5], 14, CONTENT_BOTTOM - 2.22);
   foot(s, 'CDC Yellow Book 2026（出版日 2025-04-23）｜SHINGRIX coadministration（GSK）｜非疾管署公告內容｜查詢日 2026-08-07');
   note(s, '重點是「整欄一樣」——不要一列一列念。只要指出兩件事：Shingrix 不是活性疫苗；'
-    + 'MMR／水痘的禁忌是針對免疫功能不全者本身，跟肺鏈同日與否無關。三個真正的例外在下一頁。');
+    + 'MMR／水痘的禁忌是針對免疫功能不全者本身，跟肺鏈同日與否無關。三個真正的例外在下一頁。'
+    + '被問到帶狀疱疹時可補充：台灣已無活性減毒型（Zostavax 於 2025-10-07 自請註銷），'
+    + '現行只有 Shingrix，所以帶疹疫苗不會落到活性減毒那一區。');
 }
 
 {
@@ -1392,7 +1396,7 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
   const s = slide();
   head(s, '三個例外', '門診實務');
   const items = [
-    ['1', '無脾症或 HIV 感染者', 'PCV13 與 MenACWY-D（Menactra）不可同時接種；先打 PCV13，至少 4 週後再打 Menactra。MenACWY-CRM（Menveo）無此限制'],
+    ['1', '無脾症或 HIV 感染者', 'PCV13 與 MenACWY-D（Menactra）不可同時接種；先打 PCV13，至少 4 週後再打。台灣無 Menactra 藥證，現行的 Menveo（MenACWY-CRM）無此限制，本條只適用有國外接種史者'],
     ['2', 'PCV15 與 PPV23', '不可於同一次就診接種'],
     ['3', 'RSV 疫苗', '併打時效價略低，可考慮分開，但不構成禁忌']
   ];
@@ -1408,8 +1412,10 @@ function note(s, txt) { s.addNotes(txt); notes.push(txt); }
       color: C.ink2, margin: 0
     });
   });
-  foot(s, 'CDC Pink Book Ch.2、Ch.14｜非疾管署公告內容｜第 1 條原文係針對 PCV13，是否延伸至 PCV20／PCV21 尚待確認｜查詢日 2026-08-07');
-  note(s, '第一條直接命中公費高風險族群，特別重要。');
+  foot(s, 'CDC Pink Book Ch.2、Ch.14｜非疾管署公告內容｜第 1 條僅針對 PCV13，未延伸至 PCV20／21｜藥證：食藥署開放資料｜查詢日 2026-08-09');
+  note(s, '第一條原本直接命中公費高風險族群，但台灣查無 Menactra 藥證，'
+       + '現行四價流腦疫苗是 Menveo（腦寧安，MenACWY-CRM），不受此限。'
+       + '真正會遇到的情境是病人在國外打過 Menactra。');
 }
 
 /* ═══════════ 八、結語 ═══════════ */

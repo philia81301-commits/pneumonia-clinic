@@ -37,6 +37,11 @@ def warn(label, detail=''):
     print('  ⚠ %s%s' % (label, ('　' + detail) if detail else ''))
 
 
+def accepted(label, detail=''):
+    """使用者已確認可接受的規格偏離：留紀錄，但不再列為待辦。"""
+    print('  ✓ %s　【已確認可接受】%s' % (label, ('　' + detail) if detail else ''))
+
+
 def strip_tags(h):
     h = re.sub(r'<script.*?</script>', ' ', h, flags=re.S)
     h = re.sub(r'<style.*?</style>', ' ', h, flags=re.S)
@@ -195,8 +200,10 @@ if i_bridge < 0 or i_evid < 0:
     bad('找不到免疫橋接模組或效力證據章節')
 elif i_bridge < i_evid:
     ok('免疫橋接模組在效力證據章節之前')
-    warn('模組首頁本身引用 45.56% 作為破題對照',
-         '這是模組內的教學用例，非獨立效力主張；驗收時請確認可接受')
+    accepted('模組內 S37 破題與 S39 CAPiTA 引用 45.56%',
+             '2026-08-09 使用者確認。規格卡自訂模組第③頁即為 CAPiTA，'
+             '且整節論證建立在「PCV13 有這個數字、PCV20/21 沒有」的對照上，'
+             '拿掉破題就沒有對照物；排序意圖（模組在效力證據章節之前）已達成')
 else:
     bad('免疫橋接模組出現在效力證據章節之後')
 
@@ -248,12 +255,15 @@ lt_abbr = [k for k in ABBR if k in strip_tags(leaflet)]
                               '' if not lt_abbr else '出現：' + '、'.join(lt_abbr))
 
 # ── 規格偏離 ──
-print('\n【規格偏離：需使用者確認】')
-warn('衛教單張由「A4 單頁」改為「A4 雙面兩頁」',
-     '2026-08-09 使用者明確指示維持雙面並加大邊界以容忍 Letter 紙匣；規格卡原文為單頁')
+print('\n【規格偏離：使用者已確認，不需再處理】')
+accepted('衛教單張由「A4 單頁」改為「A4 雙面兩頁」',
+         '2026-08-09 使用者明確指示維持雙面並加大邊界以容忍 Letter 紙匣；規格卡原文為單頁')
 
 print('\n' + '─' * 56)
 if fails:
     print('❌ %d 項未通過：%s' % (len(fails), '、'.join(fails)))
     sys.exit(1)
-print('✅ 驗收條件全部通過（另有 %d 項待使用者確認，見上方 ⚠）' % len(warns))
+if warns:
+    print('✅ 驗收條件全部通過（另有 %d 項待使用者確認，見上方 ⚠）' % len(warns))
+else:
+    print('✅ 驗收條件全部通過，2 項規格偏離皆已由使用者確認可接受')
