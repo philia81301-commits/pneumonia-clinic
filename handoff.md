@@ -111,5 +111,5 @@ PYTHONUTF8=1 python src/acceptance.py
 
 - 時間：2026-08-09
 - 更新者：Claude Code（Opus 5）@ DESKTOP-LVSV9Q5
-- Git：待推
+- Git：✅ 已 commit 並 push（最新 `7d55ea2`）
 - OneDrive 備份：✅ `.pptx` 已覆蓋為 56 張最新版（SHA256 比對相同）
